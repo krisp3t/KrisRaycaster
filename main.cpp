@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SDL.h>
 #include "constants.h"
+#include "map.h"
+#include "text.h"
 
 namespace KrisRaycaster
 {
@@ -55,6 +57,8 @@ namespace KrisRaycaster
             std::cerr << "Failed to create framebuffer texture : " << SDL_GetError() << std::endl;
             return -1;
         }
+
+        ReadBytes("./map/minecraft_map.txt");
 
         while (true)
         {
