@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(KrisRaycaster)
 
-set(CMAKE_C_STANDARD 17)
+# set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TARGET_PLATFORM "STM32" CACHE STRING "Target platform for build")
 set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS STM32 DESKTOP)
@@ -53,5 +53,8 @@ else ()
     message(FATAL_ERROR "Unsupported TARGET_PLATFORM: ${TARGET_PLATFORM}")
 endif ()
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 target_compile_definitions(${PROJECT_NAME} PRIVATE SCREEN_WIDTH=320 SCREEN_HEIGHT=240)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)

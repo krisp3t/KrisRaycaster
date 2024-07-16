@@ -30,6 +30,7 @@ namespace KrisRaycaster
         {
             if (hexValue == "..")
             {
+                bytes.push_back(0);
                 continue;
             }
             auto byte = static_cast<Byte_t>(std::stoi(hexValue, nullptr, 16));

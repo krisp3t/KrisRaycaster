@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "map.h"
 #include "text.h"
+#include "texture.h"
 
 namespace KrisRaycaster
 {
@@ -58,7 +59,13 @@ namespace KrisRaycaster
             return -1;
         }
 
-        ReadBytes("./map/minecraft_map.txt");
+        std::unique_ptr<Texture> wallTexture = std::make_unique<Texture>(
+                "./assets/minecraft/terrain.png",
+                TextureFormat{32, 32, 256}
+        );
+        std::unique_ptr<Map> map = std::make_unique<Map>(
+                *wallTexture,
+                "./map/minecraft_map.txt");
 
         while (true)
         {

@@ -1,5 +1,8 @@
 {
   "dependencies": [
-    "sdl2"
-  ]
+    "sdl2",
+    "sdl2-image"
+  ],
+  "version": "1.0",
+  "name": "krisraycaster"
 }

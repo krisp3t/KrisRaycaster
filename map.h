@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
 namespace KrisRaycaster
 {
@@ -10,7 +11,9 @@ namespace KrisRaycaster
 
     struct Map
     {
-        Map(Texture &texture, Text &text);
+
+        Map(const Texture &texture,
+            const std::string &layoutFilename);
 
         const Texture &texture;
         std::vector<uint_fast8_t> data; // map data

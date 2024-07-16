@@ -4,8 +4,13 @@
 
 namespace KrisRaycaster
 {
-    Map::Map(Texture &texture, Text &text) : texture(texture)
+    Map::Map(const Texture &texture, const std::string &layoutFilename) : texture(texture)
     {
+        data = ReadBytes(layoutFilename);
+        if (data.empty())
+        {
+            std::cerr << "Failed to read map layout file: " << layoutFilename << std::endl;
+        }
     }
 
     int Map::Get(size_t i, size_t j) const
