@@ -38,7 +38,7 @@ namespace KrisRaycaster
         if (SDL_CreateWindowAndRenderer(
                 FRAMEBUFFER_WIDTH,
                 FRAMEBUFFER_HEIGHT,
-                SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS,
+                SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE,
                 &window,
                 &renderer)
                 )
@@ -61,7 +61,8 @@ namespace KrisRaycaster
 
         std::unique_ptr<Texture> wallTexture = std::make_unique<Texture>(
                 "./assets/minecraft/terrain.png",
-                TextureFormat{32, 32, 256}
+                TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888},
+                *renderer
         );
         std::unique_ptr<Map> map = std::make_unique<Map>(
                 *wallTexture,
@@ -75,8 +76,12 @@ namespace KrisRaycaster
                 break;
             }
             Update();
+            SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
             SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, framebufferTexture, nullptr, nullptr);
+            SDL_Rect g = wallTexture->GetRect(8);
+            //SDL_RenderCopy(renderer, wallTexture->img, nullptr, nullptr);
+            SDL_RenderCopy(renderer, wallTexture->img, &g, nullptr);
+            //SDL_RenderCopy(renderer, framebufferTexture, nullptr, nullptr);
             SDL_RenderPresent(renderer);
         }
         // SDL_UpdateTexture()

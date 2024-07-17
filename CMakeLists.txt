@@ -49,6 +49,8 @@ elseif (TARGET_PLATFORM STREQUAL "DESKTOP")
             $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     )
     target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_DESKTOP USE_SDL)
+    find_package(SDL2_image CONFIG REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
 else ()
     message(FATAL_ERROR "Unsupported TARGET_PLATFORM: ${TARGET_PLATFORM}")
 endif ()

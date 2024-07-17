@@ -1,17 +1,38 @@
 #include <iostream>
+#include <cassert>
 #include <SDL_surface.h>
 #include <SDL_image.h>
 #include "texture.h"
 
 namespace KrisRaycaster
 {
-    Texture::Texture(const std::string &filename, TextureFormat format) : format(format)
+    Texture::Texture(
+            const std::string &filename,
+            TextureFormat format,
+            SDL_Renderer &r
+    ) : format(format)
     {
-        SDL_Surface *tmp = SDL_LoadBMP(filename.c_str());
-        if (!tmp)
+        img = IMG_LoadTexture(&r, filename.c_str());
+        if (!img)
         {
-            std::cerr << "Error in SDL_LoadBMP: " << SDL_GetError() << std::endl;
+            std::cerr << "Error in IMG_Load: " << IMG_GetError() << std::endl;
             return;
         }
+    }
+
+    Texture::~Texture()
+    {
+        SDL_DestroyTexture(img);
+    }
+
+    SDL_Rect Texture::GetRect(int ix) const
+    {
+        assert(ix < format.count);
+        SDL_Rect rect;
+        rect.x = (ix % format.rowSize) * format.imgW;
+        rect.y = (ix / format.rowSize) * format.imgH;
+        rect.w = format.imgW;
+        rect.h = format.imgH;
+        return rect;
     }
 }
