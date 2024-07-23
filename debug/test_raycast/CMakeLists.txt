@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
-project(KrisRaycaster)
+project(test_raycast)
 
 # set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TARGET_PLATFORM "STM32" CACHE STRING "Target platform for build")
 set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS STM32 DESKTOP)
 
@@ -29,7 +29,6 @@ file(GLOB SOURCES
         "${SRC_DIR}/*.h"
         "${SRC_DIR}/*.cpp"
 )
-add_subdirectory(debug/test_raycast)
 
 enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")

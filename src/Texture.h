@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL_render.h>
+#include "SDL2/SDL_render.h"
 #include <vector>
 #include <cstdint>
 #include <string>
@@ -31,5 +31,7 @@ namespace KrisRaycaster
         // std::vector<uint32_t> img; // textures storage container
 
         [[nodiscard]] SDL_Rect GetRect(int ix) const;
+
+        [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
     };
 }

@@ -1,6 +1,6 @@
-#include "map.h"
-#include "texture.h"
-#include "text.h"
+#include "Map.h"
+#include "Texture.h"
+#include "Text.h"
 
 namespace KrisRaycaster
 {
