@@ -56,14 +56,8 @@ namespace KrisRaycaster
             return -1;
         }
         SDL_SetWindowTitle(window, "KrisRaycaster");
-        std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>(sdlRend);
-
-        /*
-        std::unique_ptr<Map> map = std::make_unique<Map>(
-                *wallTexture,
-                "./map/minecraft_map.txt");
-        */
-
+        Renderer &renderer = Renderer::Get();
+        renderer.Init();
         Uint32 oldTime = 0, time = 0;
         double deltaTime;
         std::unique_ptr<Game> game = std::make_unique<Game>(sdlRend);

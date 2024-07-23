@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include "Renderer.h"
 
 namespace KrisRaycaster
 {
@@ -15,23 +16,30 @@ namespace KrisRaycaster
         uint32_t format; // texture format // TODO: rewrite to use SDL_PixelFormatEnum
     };
 
-    struct Texture
+    class Texture
     {
+        friend Renderer;
+    public:
         Texture(
                 const std::string &filename,
                 TextureFormat format,
-                SDL_Renderer &renderer
+                SDL_Renderer *r
         );
+
+        Texture(TextureFormat format, SDL_Renderer *r);
 
         ~Texture();
 
         TextureFormat format;
         // TODO: rewrite to use SDL_Texture or vector<uint32_t>
-        SDL_Texture *img;
         // std::vector<uint32_t> img; // textures storage container
 
         [[nodiscard]] SDL_Rect GetRect(int ix) const;
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
+
+    private:
+        SDL_Texture *img;
+
     };
 }

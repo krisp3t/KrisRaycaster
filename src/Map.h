@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "Math.h"
 
@@ -14,9 +15,8 @@ namespace KrisRaycaster
 
     class Map
     {
-
-        Map(const Texture &texture,
-            const std::string &layoutFilename);
+    public:
+        explicit Map(const std::string &mapPath);
 
         [[nodiscard]] int Get(size_t i, size_t j) const;
 
@@ -25,11 +25,13 @@ namespace KrisRaycaster
         Vec2f playerPos;
         Vec2f dir;
         Vec2f cameraPlane;
-
+        std::shared_ptr<Texture> floorTexture;
+        std::shared_ptr<Texture> ceilTexture;
+        std::shared_ptr<Texture> minimapTexture;
     private:
         int w, h;
         std::vector<uint_fast8_t> data; // map data
-        const Texture &texture;
 
+        void Render();
     };
 }

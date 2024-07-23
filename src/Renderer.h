@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include "Texture.h"
 
 namespace KrisRaycaster
 {
@@ -20,11 +21,18 @@ namespace KrisRaycaster
     class Renderer
     {
     public:
-        Renderer(SDL_Renderer *renderer);
+
 
         ~Renderer();
 
-        int Init();
+        static Renderer &Get();
+
+        Renderer(const Renderer &) = delete;
+
+        Renderer &operator=(const Renderer &) = delete;
+
+        int Init(SDL_Renderer *rend);
+
 
         void Render();
 
@@ -32,9 +40,23 @@ namespace KrisRaycaster
 
         bool ProcessInput();
 
+        KrisRaycaster::Texture CreateTexture(const std::string &filename, KrisRaycaster::TextureFormat format);
+
+        Texture CreateTexture(TextureFormat format);
+
     private:
+        Renderer() = default;
+
         RendererSettings settings;
         SDL_Renderer *sdlRend;
         SDL_Texture *framebufferTexture;
+
+        void BeforeFrame();
+
+        void DrawFrame();
+
+
+        Texture CreateEmptyTexture(TextureFormat format);
+
     };
 }

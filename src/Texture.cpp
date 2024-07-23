@@ -6,13 +6,33 @@
 
 namespace KrisRaycaster
 {
+    // TODO: don't hardcode target
+    Texture::Texture(
+            TextureFormat format,
+            SDL_Renderer *r
+    ) : format(format)
+    {
+        img = SDL_CreateTexture(
+                r,
+                SDL_PIXELFORMAT_ABGR8888,
+                SDL_TEXTUREACCESS_TARGET,
+                format.imgW,
+                format.imgH
+        );
+        if (!img)
+        {
+            std::cerr << "Failed to create texture : " << SDL_GetError() << std::endl;
+            return;
+        }
+    }
+
     Texture::Texture(
             const std::string &filename,
             TextureFormat format,
-            SDL_Renderer &r
+            SDL_Renderer *r
     ) : format(format)
     {
-        img = IMG_LoadTexture(&r, filename.c_str());
+        img = IMG_LoadTexture(r, filename.c_str());
         if (!img)
         {
             std::cerr << "Error in IMG_Load: " << IMG_GetError() << std::endl;
@@ -35,4 +55,6 @@ namespace KrisRaycaster
         rect.h = format.imgH;
         return rect;
     }
+
+
 }

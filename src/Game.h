@@ -22,7 +22,6 @@ namespace KrisRaycaster
     class Game
     {
     public:
-        Game(SDL_Renderer *sdlRend);
 
         void ProcessInput();
 
@@ -35,7 +34,6 @@ namespace KrisRaycaster
 
     private:
         GameSystems systems;
-        SDL_Renderer *sdlRend;
         bool hasQuit = false;
     };
 }

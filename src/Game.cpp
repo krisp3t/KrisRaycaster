@@ -3,11 +3,6 @@
 
 namespace KrisRaycaster
 {
-    Game::Game(SDL_Renderer *sdlRend) : sdlRend(sdlRend)
-    {
-        systems.renderer = std::make_unique<Renderer>(sdlRend);
-    }
-
     void Game::ProcessInput()
     {
         SDL_Event event;
@@ -27,7 +22,7 @@ namespace KrisRaycaster
 
     void Game::Render()
     {
-
+        Renderer::Get().Render(); // TODO: avoid static call?
     }
 
     bool Game::HasQuit() const
