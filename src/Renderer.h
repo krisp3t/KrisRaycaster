@@ -1,15 +1,20 @@
 #pragma once
 
 #include <SDL.h>
-#include "Texture.h"
+#include <vector>
 
 namespace KrisRaycaster
 {
+    class Texture;
+
+    class TextureFormat;
 
     struct RendererSettings
     {
-        int framebufferWidth = 1280;
-        int framebufferHeight = 720;
+        int screenWidth = 1280;
+        int screenHeight = 720;
+        int framebufferWidth = screenWidth / 2;
+        int framebufferHeight = screenHeight;
         int fov;
         int mapWidth;
         int mapHeight;
@@ -40,9 +45,12 @@ namespace KrisRaycaster
 
         bool ProcessInput();
 
-        KrisRaycaster::Texture CreateTexture(const std::string &filename, KrisRaycaster::TextureFormat format);
+        Texture *CreateTexture(const std::string &filename, TextureFormat format);
 
-        Texture CreateTexture(TextureFormat format);
+        Texture *CreateTexture(TextureFormat format);
+
+        bool InitMinimap(const Texture &floorTex, const std::vector<uint_fast8_t> &layout);
+
 
     private:
         Renderer() = default;
@@ -50,13 +58,16 @@ namespace KrisRaycaster
         RendererSettings settings;
         SDL_Renderer *sdlRend;
         SDL_Texture *framebufferTexture;
+        SDL_Texture *minimapTexture;
+        std::vector<Texture> items;
 
         void BeforeFrame();
 
         void DrawFrame();
 
+        SDL_Rect leftRec;
+        SDL_Rect rightRec;
 
-        Texture CreateEmptyTexture(TextureFormat format);
 
     };
 }

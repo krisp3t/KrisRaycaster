@@ -57,10 +57,10 @@ namespace KrisRaycaster
         }
         SDL_SetWindowTitle(window, "KrisRaycaster");
         Renderer &renderer = Renderer::Get();
-        renderer.Init();
+        renderer.Init(sdlRend);
         Uint32 oldTime = 0, time = 0;
         double deltaTime;
-        std::unique_ptr<Game> game = std::make_unique<Game>(sdlRend);
+        std::unique_ptr<Game> game = std::make_unique<Game>();
         while (!game->HasQuit())
         {
             time = SDL_GetTicks();

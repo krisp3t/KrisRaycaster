@@ -29,6 +29,11 @@ namespace KrisRaycaster
     {
         return hasQuit;
     }
+
+    Game::Game()
+    {
+        systems.map = std::make_unique<Map>("./map/minecraft");
+    }
 }
 
 

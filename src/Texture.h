@@ -14,11 +14,19 @@ namespace KrisRaycaster
         int count; // number of textures and size in pixels
         int rowSize; // number of textures in a row
         uint32_t format; // texture format // TODO: rewrite to use SDL_PixelFormatEnum
+        SDL_Rect rect;
+    };
+    struct ScreenPos
+    {
+        int x, y;
+        int w, h;
+        int zIndex;
     };
 
     class Texture
     {
-        friend Renderer;
+        friend class Renderer;
+
     public:
         Texture(
                 const std::string &filename,
@@ -38,8 +46,10 @@ namespace KrisRaycaster
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
 
+        SDL_Texture *img; // TODO: private
+
+
     private:
-        SDL_Texture *img;
 
     };
 }

@@ -13,22 +13,9 @@ namespace KrisRaycaster
             std::cerr << "Failed to read map layout file: " << mapPath << std::endl;
         }
         // TODO: don't hardcode
-        floorTexture = std::make_shared<Texture>(
-                Renderer::Get().CreateTexture(mapPath + "/wall.png", {256, 256, 64})
-        );
-        minimapTexture = std::make_shared<Texture>(
-                Renderer::Get().CreateTexture({256, 256, 64})
-        );
-
-        for (uint_fast8_t tile: data)
-        {
-            if (tile == 0)
-            {
-                continue;
-            }
-        }
-        SDL_Rect r = floorTexture->GetRect(tile);
-
+        floorTexture = Renderer::Get().CreateTexture(mapPath + "/wall.png",
+                                                     TextureFormat{256, 256, 64, 16, SDL_PIXELFORMAT_ABGR8888});
+        Renderer::Get().InitMinimap(*floorTexture, data);
     }
 
     int Map::Get(size_t i, size_t j) const

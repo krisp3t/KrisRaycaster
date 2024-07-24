@@ -14,7 +14,7 @@ namespace KrisRaycaster
 
     struct GameSystems
     {
-        std::unique_ptr<Renderer> renderer;
+        //std::unique_ptr<Renderer> renderer;
         std::unique_ptr<Map> map;
         //std::unique_ptr<Text> text;
     };
@@ -22,6 +22,7 @@ namespace KrisRaycaster
     class Game
     {
     public:
+        Game();
 
         void ProcessInput();
 

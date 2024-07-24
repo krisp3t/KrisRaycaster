@@ -10,7 +10,8 @@
 
 namespace KrisRaycaster
 {
-    struct Texture;
+    class Texture;
+
     struct Text;
 
     class Map
@@ -25,9 +26,9 @@ namespace KrisRaycaster
         Vec2f playerPos;
         Vec2f dir;
         Vec2f cameraPlane;
-        std::shared_ptr<Texture> floorTexture;
+        Texture *floorTexture;
         std::shared_ptr<Texture> ceilTexture;
-        std::shared_ptr<Texture> minimapTexture;
+        Texture *minimapTexture;
     private:
         int w, h;
         std::vector<uint_fast8_t> data; // map data

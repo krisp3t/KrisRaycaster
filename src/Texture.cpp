@@ -42,7 +42,8 @@ namespace KrisRaycaster
 
     Texture::~Texture()
     {
-        SDL_DestroyTexture(img);
+        // TODO: Destroy img
+
     }
 
     SDL_Rect Texture::GetRect(int ix) const

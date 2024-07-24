@@ -7,6 +7,7 @@
 
 namespace KrisRaycaster
 {
+
     Renderer &Renderer::Get()
     {
         static Renderer instance;
@@ -28,54 +29,95 @@ namespace KrisRaycaster
             std::cerr << "Failed to create framebuffer texture : " << SDL_GetError() << std::endl;
             return -1;
         }
+        leftRec = SDL_Rect{0, 0, settings.framebufferWidth, settings.framebufferHeight};
+        rightRec = SDL_Rect{settings.framebufferWidth, 0, settings.framebufferWidth, settings.framebufferHeight};
         return 0;
     }
 
-    Texture Renderer::CreateTexture(
+    bool Renderer::InitMinimap(const Texture &floorTex, const std::vector<uint_fast8_t> &layout)
+    {
+        int mapTexW = floorTex.format.imgW * settings.mapWidth;
+        int mapTexH = floorTex.format.imgH * settings.mapHeight;
+        minimapTexture = SDL_CreateTexture(
+                sdlRend,
+                SDL_PIXELFORMAT_ABGR8888,
+                SDL_TEXTUREACCESS_TARGET,
+                settings.framebufferWidth,
+                settings.framebufferHeight
+        );
+        if (!minimapTexture)
+        {
+            std::cerr << "Failed to create minimap texture : " << SDL_GetError() << std::endl;
+            return false;
+        }
+        SDL_SetRenderTarget(sdlRend, minimapTexture);
+        int ix = 0;
+        /*
+        for (uint_fast8_t tile: layout)
+        {
+            if (tile == 0)
+            {
+                continue;
+            }
+            SDL_Rect r = floorTex.GetRect(tile);
+            SDL_Rect dest = {(ix / floorTex.format.rowSize) * floorTex.format.imgW,
+                             (ix % floorTex.format.rowSize) * floorTex.format.imgH, floorTex.format.imgW,
+                             floorTex.format.imgH};
+        }
+         */
+        //SDL_Texture *t = SDL_CreateTextureFromSurface(sdlRend, floorTex.img);
+        SDL_RenderCopy(sdlRend, floorTex.img, nullptr, nullptr);
+
+        SDL_SetRenderTarget(sdlRend, nullptr);
+        return true;
+    }
+
+    Texture *Renderer::CreateTexture(
             TextureFormat format
     )
     {
-        return Texture{format, sdlRend};
+        auto t = Texture{format, sdlRend};
+        items.push_back(t);
+        return &items.back();
     }
 
-    // TODO: copy?
-    Texture Renderer::CreateTexture(
+    Texture *Renderer::CreateTexture(
             const std::string &filename,
             TextureFormat format
     )
     {
-        return Texture{filename, format, sdlRend};
-    }
-
-    void Renderer::CopyToFramebuffer(const Texture &texture)
-    {
-        /*
-        SDL_UpdateTexture(
-                framebufferTexture,
-                nullptr,
-                texture.img,
-                texture.format.imgW * sizeof(uint32_t)
-        );
-         */
+        auto t = Texture{filename, format, sdlRend};
+        items.push_back(t);
+        return &items.back();
     }
 
     void Renderer::BeforeFrame()
     {
-        SDL_SetRenderDrawColor(sdlRend, 0x00, 0x00, 0x00, 0xFF);
+        SDL_SetRenderTarget(sdlRend, nullptr);
+        SDL_SetRenderDrawColor(sdlRend, 0xFF, 0x00, 0xFF, 0xFF);
         SDL_RenderClear(sdlRend);
     }
 
     void Renderer::DrawFrame()
     {
-        // Draw minimap
-        // SDL_Rect g = wallTexture->GetRect(8);
-        //   SDL_RenderCopy(renderer, wallTexture->img, &g, nullptr);
+        for (const auto &item: items)
+        {
+            /*
+            SDL_LockTexture(framebufferTexture, nullptr, &item.pixels, &item.pitch);
+
+            SDL_UnlockTexture(framebufferTexture);
+             */
+        }
     }
 
     void Renderer::Render()
     {
         BeforeFrame();
         DrawFrame();
+        // draw minimap
+        SDL_RenderCopy(sdlRend, minimapTexture, nullptr, &leftRec);
+        // draw raycasted scene
+        SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
         SDL_RenderPresent(sdlRend);
     }
 
