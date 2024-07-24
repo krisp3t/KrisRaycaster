@@ -10,9 +10,9 @@ namespace KrisRaycaster
 {
     struct TextureFormat
     {
-        int imgW, imgH; // sprite size
+        int spriteW, spriteH; // sprite size
         int count; // number of textures and size in pixels
-        int rowSize; // number of textures in a row
+        int rowCount; // number of textures in a row
         uint32_t format; // texture format // TODO: rewrite to use SDL_PixelFormatEnum
         SDL_Rect rect;
     };

@@ -16,8 +16,8 @@ namespace KrisRaycaster
                 r,
                 SDL_PIXELFORMAT_ABGR8888,
                 SDL_TEXTUREACCESS_TARGET,
-                format.imgW,
-                format.imgH
+                format.spriteW * format.rowCount,
+                format.spriteH * format.count / format.rowCount
         );
         if (!img)
         {
@@ -48,12 +48,14 @@ namespace KrisRaycaster
 
     SDL_Rect Texture::GetRect(int ix) const
     {
-        assert(ix < format.count);
+        int i = ix - 1; // 0 means empty space, 1 is first sprite in layout
+        assert(i >= 0);
+        assert(i < format.count);
         SDL_Rect rect;
-        rect.x = (ix % format.rowSize) * format.imgW;
-        rect.y = (ix / format.rowSize) * format.imgH;
-        rect.w = format.imgW;
-        rect.h = format.imgH;
+        rect.x = (i % format.rowCount) * format.spriteW;
+        rect.y = (i / format.rowCount) * format.spriteH;
+        rect.w = format.spriteW;
+        rect.h = format.spriteH;
         return rect;
     }
 

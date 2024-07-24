@@ -14,7 +14,7 @@ namespace KrisRaycaster
         }
         // TODO: don't hardcode
         floorTexture = Renderer::Get().CreateTexture(mapPath + "/wall.png",
-                                                     TextureFormat{256, 256, 64, 16, SDL_PIXELFORMAT_ABGR8888});
+                                                     TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888});
         Renderer::Get().InitMinimap(*floorTexture, data);
     }
 

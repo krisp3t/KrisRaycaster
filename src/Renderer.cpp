@@ -36,8 +36,7 @@ namespace KrisRaycaster
 
     bool Renderer::InitMinimap(const Texture &floorTex, const std::vector<uint_fast8_t> &layout)
     {
-        int mapTexW = floorTex.format.imgW * settings.mapWidth;
-        int mapTexH = floorTex.format.imgH * settings.mapHeight;
+        const int tileBorder = 1;
         minimapTexture = SDL_CreateTexture(
                 sdlRend,
                 SDL_PIXELFORMAT_ABGR8888,
@@ -52,21 +51,33 @@ namespace KrisRaycaster
         }
         SDL_SetRenderTarget(sdlRend, minimapTexture);
         int ix = 0;
-        /*
+        int mapSize = layout.size();
+        int mapWidth = sqrt(mapSize);
+        Vec2 tileSize{settings.framebufferWidth / mapWidth, settings.framebufferHeight / mapWidth};
         for (uint_fast8_t tile: layout)
         {
+            SDL_Rect dest;
+            dest.x = (ix % mapWidth) * tileSize.x;
+            dest.y = (ix / mapWidth) * tileSize.y;
+            dest.w = tileSize.x;
+            dest.h = tileSize.y;
             if (tile == 0)
             {
-                continue;
+                SDL_SetRenderDrawColor(sdlRend, 0xE5, 0xE5, 0xE5, 0xFF);
+                SDL_RenderFillRect(sdlRend, &dest);
+            } else
+            {
+                dest.x += tileBorder;
+                dest.y += tileBorder;
+                dest.w -= tileBorder * 2;
+                dest.h -= tileBorder * 2;
+                SDL_Rect src = floorTex.GetRect(tile);
+                SDL_RenderCopy(sdlRend, floorTex.img, &src, &dest);
             }
-            SDL_Rect r = floorTex.GetRect(tile);
-            SDL_Rect dest = {(ix / floorTex.format.rowSize) * floorTex.format.imgW,
-                             (ix % floorTex.format.rowSize) * floorTex.format.imgH, floorTex.format.imgW,
-                             floorTex.format.imgH};
+            ix++;
         }
-         */
         //SDL_Texture *t = SDL_CreateTextureFromSurface(sdlRend, floorTex.img);
-        SDL_RenderCopy(sdlRend, floorTex.img, nullptr, nullptr);
+
 
         SDL_SetRenderTarget(sdlRend, nullptr);
         return true;
