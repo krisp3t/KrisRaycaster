@@ -17,14 +17,7 @@ namespace KrisRaycaster
         int framebufferWidth = screenWidth / 2;
         int framebufferHeight = screenHeight;
         float fov = 60.0;
-        int mapWidth;
-        int mapHeight;
-        int tileSize;
-        float rayIncrementAngle = fov / framebufferWidth;
-        int rayPrecision = 64;
-        double depth;
-        Vec2 playerPos = {7, 14}; // TODO: move out of here!
-        float playerAngle = 0.0; // TODO: move out of here!
+        float rayIncrement = 0.01;
     };
 
     class Renderer
@@ -77,5 +70,9 @@ namespace KrisRaycaster
         void CastRaysBasic();
 
         void DrawVLine(int x, int height);
+
+        void DrawVLine(int x, int height, uint32_t color);
+
+        void DrawVLine(int x, int y, int height, uint32_t color);
     };
 }

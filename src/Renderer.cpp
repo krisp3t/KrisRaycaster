@@ -1,6 +1,6 @@
 #include <iostream>
-#include <SDL2/SDL.h>
-
+#include <SDL.h>
+#include <cassert>
 #include "Renderer.h"
 #include "Map.h"
 #include "Texture.h"
@@ -108,40 +108,42 @@ namespace KrisRaycaster
     void Renderer::CastRaysBasic()
     {
         // TODO: display in minimap
-        float rayAngle = settings.playerAngle - (settings.fov / 2); // if FOV 60, then [-30, 30]
+        Map *map = Game::Get().systems.map.get();
+        float playerAngle = atan2(map->dir.x, map->dir.y);
+        float fov = DegToRad(settings.fov);
+        Vec2f playerPos = map->playerPos;
         int mapSize = Game::Get().systems.map->GetSize();
+        int rectW = settings.framebufferWidth / mapSize;
+        int rectH = settings.framebufferHeight / mapSize;
         for (int i = 0; i < settings.framebufferWidth; i++)
         {
-            Vec2 ray;
-
-            float dx = cos(rayAngle);
-            float dy = sin(rayAngle);
-            int wall = 0;
-            while (wall == 0)
+            // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
+            float rayAngle = (playerAngle - fov / 2) + (fov * i / settings.framebufferWidth);
+            float distance = 0;
+            for (; distance < 100; distance += settings.rayIncrement)
             {
-                ray = {
-                        static_cast<int>(floor(settings.playerPos.x + dx)),
-                        static_cast<int>(floor(settings.playerPos.y + dy))
-                };
-                wall = Game::Get().systems.map->Get(ray.x / mapSize, ray.y / mapSize);
-                dx += cos(rayAngle) / settings.rayPrecision;
-                dy += sin(rayAngle) / settings.rayPrecision;
-                rayAngle += settings.rayIncrementAngle;
+                float cx = playerPos.x + distance * cos(rayAngle);
+                float cy = playerPos.y + distance * sin(rayAngle);
+                int wall = Game::Get().systems.map->Get(static_cast<int>(cx), static_cast<int>(cy));
+                if (wall != 0)
+                {
+                    break;
+                }
             }
-            float distance = sqrt(pow(ray.x, 2) + pow(ray.y, 2));
-            int wallHeight = floor(settings.framebufferHeight / distance);
-            SDL_Log("Drawing line at %d with height %d, distance %f, wall: (%d, %d)", i, wallHeight, distance, ray.x,
-                    ray.y);
-
-            DrawVLine(i, wallHeight);
+            int wallHeight = floor(settings.framebufferHeight / Fmax(distance, 1.0));
+            DrawVLine(i, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
         }
     }
 
-    void Renderer::DrawVLine(int x, int height)
+    void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
-        for (int y = settings.framebufferHeight - 1; y >= height; y--)
+        assert(y >= 0 && y < settings.framebufferHeight);
+        assert(height >= 0 && height <= settings.framebufferHeight);
+        assert(x >= 0 && x < settings.framebufferWidth);
+        for (int i = 0; i < height; i++)
         {
-            framebuffer[y * settings.framebufferWidth + x] = 0xFF0000FF;
+            int iy = y + i;
+            framebuffer[iy * settings.framebufferWidth + x] = color;
         }
     }
 
@@ -150,6 +152,7 @@ namespace KrisRaycaster
         SDL_SetRenderTarget(sdlRend, nullptr);
         SDL_SetRenderDrawColor(sdlRend, 0xFF, 0x00, 0xFF, 0xFF);
         SDL_RenderClear(sdlRend);
+        memset(framebuffer.data(), 0, framebuffer.size() * sizeof(uint32_t));
     }
 
     void Renderer::DrawFrame()
