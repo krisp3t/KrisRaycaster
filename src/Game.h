@@ -15,7 +15,7 @@ namespace KrisRaycaster
     struct GameSystems
     {
         //std::unique_ptr<Renderer> renderer;
-        std::unique_ptr<Map> map;
+        std::shared_ptr<Map> map;
         //std::unique_ptr<Text> text;
     };
 
@@ -30,7 +30,7 @@ namespace KrisRaycaster
 
         static Game &Get();
 
-        void ProcessInput();
+        void ProcessInput(double deltaTime);
 
         void Update(double deltaTime);
 
@@ -42,5 +42,6 @@ namespace KrisRaycaster
         GameSystems systems;
     private:
         bool hasQuit = false;
+
     };
 }

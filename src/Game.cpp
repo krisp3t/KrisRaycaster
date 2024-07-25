@@ -10,7 +10,7 @@ namespace KrisRaycaster
     }
 
 
-    void Game::ProcessInput()
+    void Game::ProcessInput(double deltaTime)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -19,6 +19,23 @@ namespace KrisRaycaster
             {
                 hasQuit = true;
             }
+        }
+        const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+        if (currentKeyStates[SDL_SCANCODE_W])
+        {
+            systems.map->MovePlayer(3 * deltaTime);
+        }
+        if (currentKeyStates[SDL_SCANCODE_S])
+        {
+            systems.map->MovePlayer(-3 * deltaTime);
+        }
+        if (currentKeyStates[SDL_SCANCODE_A])
+        {
+            systems.map->StrafePlayer(-5 * deltaTime);
+        }
+        if (currentKeyStates[SDL_SCANCODE_D])
+        {
+            systems.map->StrafePlayer(5 * deltaTime);
         }
     }
 

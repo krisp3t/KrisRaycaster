@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "Text.h"
 #include "Renderer.h"
+#include "Game.h"
 
 namespace KrisRaycaster
 {
@@ -36,8 +37,29 @@ namespace KrisRaycaster
         return false;
     }
 
-    void Map::Render()
+    Vec2f Map::GetPlayer()
+    {
+        return playerPos;
+    }
+
+    void Map::MovePlayer(float step)
     {
 
+        float angle = atan2(dir.x, dir.y);
+        playerPos.x += cos(angle) * step;
+        playerPos.y += sin(angle) * step;
+
+        /*
+        SDL_Log("old: %f, %f", playerPos.x, playerPos.y);
+        playerPos.x += dir.x * step;
+        playerPos.y += dir.y * step;
+        SDL_Log("new: %f, %f", playerPos.x, playerPos.y);
+         */
+
+    }
+
+    void Map::StrafePlayer(float angle)
+    {
+        dir = dir * angle;
     }
 }

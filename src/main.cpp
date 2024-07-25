@@ -60,12 +60,12 @@ namespace KrisRaycaster
         renderer.Init(sdlRend);
         Uint32 oldTime = 0, time = 0;
         double deltaTime;
-        std::unique_ptr<Game> game = std::make_unique<Game>();
+        Game *game = &Game::Get();
         while (!game->HasQuit())
         {
             time = SDL_GetTicks();
-            game->ProcessInput();
             deltaTime = (time - oldTime) / 1000.0;
+            game->ProcessInput(deltaTime);
             game->Update(deltaTime);
             game->Render();
             oldTime = time;
