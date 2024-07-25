@@ -74,5 +74,7 @@ namespace KrisRaycaster
         void DrawVLine(int x, int height, uint32_t color);
 
         void DrawVLine(int x, int y, int height, uint32_t color);
+
+        void DrawPlayerMinimap();
     };
 }

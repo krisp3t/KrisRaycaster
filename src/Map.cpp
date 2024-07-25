@@ -44,18 +44,8 @@ namespace KrisRaycaster
 
     void Map::MovePlayer(float step)
     {
-
-        float angle = atan2(dir.x, dir.y);
-        playerPos.x += cos(angle) * step;
-        playerPos.y += sin(angle) * step;
-
-        /*
-        SDL_Log("old: %f, %f", playerPos.x, playerPos.y);
-        playerPos.x += dir.x * step;
-        playerPos.y += dir.y * step;
-        SDL_Log("new: %f, %f", playerPos.x, playerPos.y);
-         */
-
+        playerPos.x += dir.y * step;
+        playerPos.y += dir.x * step;
     }
 
     void Map::StrafePlayer(float angle)

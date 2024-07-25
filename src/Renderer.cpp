@@ -104,6 +104,34 @@ namespace KrisRaycaster
         return &items.back();
     }
 
+    void Renderer::DrawPlayerMinimap()
+    {
+        // Draw rectangle for player
+        Map *map = Game::Get().systems.map.get();
+        int mapSize = map->GetSize();
+        float playerX = map->playerPos.x * settings.framebufferWidth / mapSize;
+        float playerY = map->playerPos.y * settings.framebufferHeight / mapSize;
+
+        // Draw player position (as a small circle or rectangle)
+        SDL_SetRenderDrawColor(sdlRend, 255, 0, 0, 255);  // Red color
+        SDL_Rect playerRect = {
+                static_cast<int>(playerX) - 2,
+                static_cast<int>(playerY) - 2,
+                20, 20
+        };
+        SDL_RenderFillRect(sdlRend, &playerRect);
+
+        // Draw player direction
+        float dirX = map->dir.x * 50;  // Multiply by a factor to make the line visible
+        float dirY = map->dir.y * 50;
+        SDL_RenderDrawLine(sdlRend,
+                           static_cast<int>(playerX),
+                           static_cast<int>(playerY),
+                           static_cast<int>(playerX + dirX),
+                           static_cast<int>(playerY + dirY)
+        );
+    }
+
     // Basic (slow) implementation - just go along the rays with increments until you hit wall
     void Renderer::CastRaysBasic()
     {
@@ -174,6 +202,8 @@ namespace KrisRaycaster
         DrawFrame();
         // draw minimap
         SDL_RenderCopy(sdlRend, minimapTexture, nullptr, &leftRec);
+        // draw player on minimap
+        DrawPlayerMinimap();
         // draw raycasted scene
         SDL_UpdateTexture(framebufferTexture, nullptr, framebuffer.data(),
                           static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
