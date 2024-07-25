@@ -15,13 +15,6 @@ struct Vec
     const float &operator[](int i) const
     { return v[i]; }
 
-    Vec<n, T> operator+(const Vec<n, T> &other) const
-    {
-        Vec<n, T> result;
-        for (int i = 0; i < n; i++)
-            result[i] = v[i] + other[i];
-        return result;
-    }
     // TODO: add normalized
 };
 
@@ -30,11 +23,35 @@ struct Vec<2, int>
 {
     int x, y;
 
-    Vec<2, int> operator*(float angle) const
+    Vec<2, int> Rotate(float angle) const
     {
         Vec<2, int> result{};
         result.x = this->x * cos(angle) - this->y * sin(angle);
         result.y = this->x * sin(angle) + this->y * cos(angle);
+        return result;
+    }
+
+    Vec<2, int> operator+(const Vec<2, int> &other) const
+    {
+        Vec<2, int> result{};
+        result.x = this->x + other.x;
+        result.y = this->y + other.y;
+        return result;
+    }
+
+    Vec<2, int> operator-(const Vec<2, int> &other) const
+    {
+        Vec<2, int> result{};
+        result.x = this->x - other.x;
+        result.y = this->y - other.y;
+        return result;
+    }
+
+    Vec<2, int> operator*(int scalar) const
+    {
+        Vec<2, int> result{};
+        result.x = this->x * scalar;
+        result.y = this->y * scalar;
         return result;
     }
 };
@@ -44,11 +61,35 @@ struct Vec<2, float>
 {
     float x, y;
 
-    Vec<2, float> operator*(float angle) const
+    Vec<2, float> Rotate(float angle) const
     {
         Vec<2, float> result{};
         result.x = this->x * cos(-angle) - this->y * sin(-angle);
         result.y = this->x * sin(-angle) + this->y * cos(-angle);
+        return result;
+    }
+
+    Vec<2, float> operator+(const Vec<2, float> &other) const
+    {
+        Vec<2, float> result{};
+        result.x = this->x + other.x;
+        result.y = this->y + other.y;
+        return result;
+    }
+
+    Vec<2, float> operator-(const Vec<2, float> &other) const
+    {
+        Vec<2, float> result{};
+        result.x = this->x - other.x;
+        result.y = this->y - other.y;
+        return result;
+    }
+
+    Vec<2, float> operator*(float scalar) const
+    {
+        Vec<2, float> result{};
+        result.x = this->x * scalar;
+        result.y = this->y * scalar;
         return result;
     }
 };

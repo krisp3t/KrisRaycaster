@@ -106,6 +106,8 @@ namespace KrisRaycaster
 
     void Renderer::DrawPlayerMinimap()
     {
+        constexpr int playerSize = 20;
+        constexpr int playerOffset = playerSize / 2;
         // Draw rectangle for player
         Map *map = Game::Get().systems.map.get();
         int mapSize = map->GetSize();
@@ -115,18 +117,30 @@ namespace KrisRaycaster
         // Draw player position (as a small circle or rectangle)
         SDL_SetRenderDrawColor(sdlRend, 255, 0, 0, 255);  // Red color
         SDL_Rect playerRect = {
-                static_cast<int>(playerX) - 2,
-                static_cast<int>(playerY) - 2,
-                20, 20
+                static_cast<int>(playerX),
+                static_cast<int>(playerY),
+                playerSize, playerSize
         };
         SDL_RenderFillRect(sdlRend, &playerRect);
 
+        // Draw camera plane
+        SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255);  // Green color
+        float cameraX = map->cameraPlane.x * 50;  // Multiply by a factor to make the line visible
+        float cameraY = map->cameraPlane.y * 50;
+        SDL_RenderDrawLine(sdlRend,
+                           static_cast<int>(playerX + playerOffset),
+                           static_cast<int>(playerY + playerOffset),
+                           static_cast<int>(playerX + cameraX),
+                           static_cast<int>(playerY + cameraY)
+        );
+
         // Draw player direction
+        SDL_SetRenderDrawColor(sdlRend, 180, 0, 0, 255);
         float dirX = map->dir.x * 50;  // Multiply by a factor to make the line visible
         float dirY = map->dir.y * 50;
         SDL_RenderDrawLine(sdlRend,
-                           static_cast<int>(playerX),
-                           static_cast<int>(playerY),
+                           static_cast<int>(playerX + playerOffset),
+                           static_cast<int>(playerY + playerOffset),
                            static_cast<int>(playerX + dirX),
                            static_cast<int>(playerY + dirY)
         );
@@ -137,37 +151,47 @@ namespace KrisRaycaster
     {
         // TODO: display in minimap
         Map *map = Game::Get().systems.map.get();
-        float playerAngle = atan2(map->dir.x, map->dir.y);
-        float fov = DegToRad(settings.fov);
         Vec2f playerPos = map->playerPos;
+        Vec2f dir = map->dir;
+        Vec2f cameraPlane = map->cameraPlane;
         int mapSize = Game::Get().systems.map->GetSize();
-        int rectW = settings.framebufferWidth / mapSize;
-        int rectH = settings.framebufferHeight / mapSize;
-        for (int i = 0; i < settings.framebufferWidth; i++)
+        //int rectW = settings.framebufferWidth / mapSize;
+        //int rectH = settings.framebufferHeight / mapSize;
+        for (int x = 0; x < settings.framebufferWidth; x++)
         {
             // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
-            float rayAngle = (playerAngle - fov / 2) + (fov * i / settings.framebufferWidth);
+            float cameraX = 2 * x / static_cast<float>(settings.framebufferWidth) - 1; // x in camera space [-1, 1]
+            Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
+                            dir.y + cameraPlane.y * cameraX};
             float distance = 0;
-            for (; distance < 100; distance += settings.rayIncrement)
+            while (distance < 100)
             {
-                float cx = playerPos.x + distance * cos(rayAngle);
-                float cy = playerPos.y + distance * sin(rayAngle);
-                int wall = Game::Get().systems.map->Get(static_cast<int>(cx), static_cast<int>(cy));
-                if (wall != 0)
+                Vec2f rayPos = playerPos + rayDir * distance;
+                int mapX = static_cast<int>(rayPos.x);
+                int mapY = static_cast<int>(rayPos.y);
+                if (Game::Get().systems.map->Get(mapX, mapY) != 0)
                 {
                     break;
                 }
+                distance += settings.rayIncrement;
             }
             int wallHeight = floor(settings.framebufferHeight / Fmax(distance, 1.0));
-            DrawVLine(i, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            // ceiling
+            DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
+            // walls
+            DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            // floor
+            DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
+                      settings.framebufferHeight / 2 - wallHeight / 2,
+                      0xFFFF0000);
         }
     }
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
-        assert(y >= 0 && y < settings.framebufferHeight);
+        assert((y >= 0 && y < settings.framebufferHeight) || (height == 0));
         assert(height >= 0 && height <= settings.framebufferHeight);
-        assert(x >= 0 && x < settings.framebufferWidth);
+        assert(x >= 0 && x < settings.framebufferWidth || (height == 0));
         for (int i = 0; i < height; i++)
         {
             int iy = y + i;

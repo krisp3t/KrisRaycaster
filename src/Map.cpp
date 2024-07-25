@@ -44,12 +44,12 @@ namespace KrisRaycaster
 
     void Map::MovePlayer(float step)
     {
-        playerPos.x += dir.y * step;
-        playerPos.y += dir.x * step;
+        playerPos = playerPos + dir * step;
     }
 
     void Map::StrafePlayer(float angle)
     {
-        dir = dir * angle;
+        dir = dir.Rotate(angle);
+        cameraPlane = cameraPlane.Rotate(angle);
     }
 }
