@@ -92,7 +92,7 @@ struct Vec<2, float>
         result.y = this->y + other;
         return result;
     }
-    
+
     Vec<2, float> operator-(const Vec<2, float> &other) const
     {
         Vec<2, float> result{};
@@ -141,3 +141,10 @@ inline float Fmax(float a, float b)
     return a > b ? a : b;
 }
 
+inline Vec2 MapToScreen(Vec2f pos, Vec2 screenSize, int mapSize)
+{
+    Vec2 result{};
+    result.x = floor(pos.x * screenSize.x / mapSize);
+    result.y = floor(pos.y * screenSize.y / mapSize);
+    return result;
+}

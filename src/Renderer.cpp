@@ -128,17 +128,6 @@ namespace KrisRaycaster
 
         // Draw rays
         SDL_SetRenderDrawColor(sdlRend, 0, 0, 255, 255);  // Blue color
-        /*
-        for (const auto &ray: rays)
-        {
-            SDL_RenderDrawLine(sdlRend,
-                               static_cast<int>(playerX + playerOffset),
-                               static_cast<int>(playerY + playerOffset),
-                               ray.x,
-                               ray.y
-            );
-        }
-         */
         SDL_RenderDrawLines(sdlRend, rays.data(), rays.size());
 
         Vec2f cameraRay = map->cameraPlane * 50.0f;
@@ -153,16 +142,7 @@ namespace KrisRaycaster
                            static_cast<int>(dirRay.x),
                            static_cast<int>(dirRay.y)
         );
-
         // Draw camera plane
-        Vec2f cameraStart = {
-                playerCentre.x + map->cameraPlane.x * 50.0f,
-                playerCentre.y + map->cameraPlane.y * 50.0f
-        };
-        Vec2f cameraEnd = {
-                playerCentre.x - map->cameraPlane.x * 50.0f,
-                playerCentre.y - map->cameraPlane.y * 50.0f
-        };
         SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255);  // Green color
         SDL_RenderDrawLine(sdlRend,
                            static_cast<int>(dirRay.x - cameraRay.x),
@@ -170,14 +150,13 @@ namespace KrisRaycaster
                            static_cast<int>(dirRay.x + cameraRay.x),
                            static_cast<int>(dirRay.y + cameraRay.y)
         );
-
-
     }
 
     // Basic (slow) implementation - just go along the rays with increments until you hit wall
     void Renderer::CastRaysBasic()
     {
-        rays = std::vector<SDL_Point>(settings.framebufferWidth * 2);
+        rays = std::vector<SDL_Point>{};
+        rays.reserve(settings.framebufferWidth * 2);
         Map *map = Game::Get().systems.map.get();
         Vec2f playerPos = map->playerPos;
         Vec2f dir = map->dir;
@@ -191,24 +170,27 @@ namespace KrisRaycaster
             float cameraX = 2 * x / static_cast<float>(settings.framebufferWidth) - 1; // x in camera space [-1, 1]
             Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
                             dir.y + cameraPlane.y * cameraX};
-            float distance = 0;
+            Vec2 start = MapToScreen(playerPos + rayDir, Vec2{settings.framebufferWidth, settings.framebufferHeight},
+                                     mapSize);
+            float distance = 1;
+            Vec2f rayPos = playerPos + rayDir * distance;
+
             while (distance < 100)
             {
-                Vec2f rayPos = playerPos + rayDir * distance;
+                rayPos = playerPos + rayDir * distance;
                 int mapX = static_cast<int>(rayPos.x);
                 int mapY = static_cast<int>(rayPos.y);
                 int wall = map->Get(mapX, mapY);
                 if (wall != 0)
                 {
-                    int pixelX = floor((rayPos.x / mapSize) * settings.framebufferWidth);
-                    int pixelY = floor((rayPos.y / mapSize) * settings.framebufferHeight);
-                    SDL_Point p = {pixelX, pixelY};
-                    rays[x] = {static_cast<int>(rayDir.x), static_cast<int>(rayDir.y)};
-                    rays[x + 1] = p;
                     break;
                 }
                 distance += settings.rayIncrement;
             }
+            Vec2 collisionPx = MapToScreen(rayPos, Vec2{settings.framebufferWidth, settings.framebufferHeight},
+                                           mapSize);
+            rays.push_back({start.x, start.y});
+            rays.push_back({collisionPx.x, collisionPx.y});
             int wallHeight = floor(settings.framebufferHeight / Fmax(distance, 1.0));
             // ceiling
             DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
