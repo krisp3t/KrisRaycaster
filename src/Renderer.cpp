@@ -111,45 +111,73 @@ namespace KrisRaycaster
         // Draw rectangle for player
         Map *map = Game::Get().systems.map.get();
         int mapSize = map->GetSize();
-        float playerX = map->playerPos.x * settings.framebufferWidth / mapSize;
-        float playerY = map->playerPos.y * settings.framebufferHeight / mapSize;
+        Vec2f playerPos = {
+                map->playerPos.x * settings.framebufferWidth / mapSize,
+                map->playerPos.y * settings.framebufferHeight / mapSize
+        };
+
 
         // Draw player position (as a small circle or rectangle)
         SDL_SetRenderDrawColor(sdlRend, 255, 0, 0, 255);  // Red color
         SDL_Rect playerRect = {
-                static_cast<int>(playerX),
-                static_cast<int>(playerY),
+                static_cast<int>(playerPos.x),
+                static_cast<int>(playerPos.y),
                 playerSize, playerSize
         };
         SDL_RenderFillRect(sdlRend, &playerRect);
 
-        // Draw camera plane
-        SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255);  // Green color
-        float cameraX = map->cameraPlane.x * 50;  // Multiply by a factor to make the line visible
-        float cameraY = map->cameraPlane.y * 50;
-        SDL_RenderDrawLine(sdlRend,
-                           static_cast<int>(playerX + playerOffset),
-                           static_cast<int>(playerY + playerOffset),
-                           static_cast<int>(playerX + cameraX),
-                           static_cast<int>(playerY + cameraY)
-        );
+        // Draw rays
+        SDL_SetRenderDrawColor(sdlRend, 0, 0, 255, 255);  // Blue color
+        /*
+        for (const auto &ray: rays)
+        {
+            SDL_RenderDrawLine(sdlRend,
+                               static_cast<int>(playerX + playerOffset),
+                               static_cast<int>(playerY + playerOffset),
+                               ray.x,
+                               ray.y
+            );
+        }
+         */
+        SDL_RenderDrawLines(sdlRend, rays.data(), rays.size());
+
+        Vec2f cameraRay = map->cameraPlane * 50.0f;
+        Vec2f playerCentre = playerPos + static_cast<float>(playerOffset);
+        Vec2f dirRay = playerCentre + map->dir * 50.0f;
 
         // Draw player direction
         SDL_SetRenderDrawColor(sdlRend, 180, 0, 0, 255);
-        float dirX = map->dir.x * 50;  // Multiply by a factor to make the line visible
-        float dirY = map->dir.y * 50;
         SDL_RenderDrawLine(sdlRend,
-                           static_cast<int>(playerX + playerOffset),
-                           static_cast<int>(playerY + playerOffset),
-                           static_cast<int>(playerX + dirX),
-                           static_cast<int>(playerY + dirY)
+                           static_cast<int>(playerCentre.x),
+                           static_cast<int>(playerCentre.y),
+                           static_cast<int>(dirRay.x),
+                           static_cast<int>(dirRay.y)
         );
+
+        // Draw camera plane
+        Vec2f cameraStart = {
+                playerCentre.x + map->cameraPlane.x * 50.0f,
+                playerCentre.y + map->cameraPlane.y * 50.0f
+        };
+        Vec2f cameraEnd = {
+                playerCentre.x - map->cameraPlane.x * 50.0f,
+                playerCentre.y - map->cameraPlane.y * 50.0f
+        };
+        SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255);  // Green color
+        SDL_RenderDrawLine(sdlRend,
+                           static_cast<int>(dirRay.x - cameraRay.x),
+                           static_cast<int>(dirRay.y - cameraRay.y),
+                           static_cast<int>(dirRay.x + cameraRay.x),
+                           static_cast<int>(dirRay.y + cameraRay.y)
+        );
+
+
     }
 
     // Basic (slow) implementation - just go along the rays with increments until you hit wall
     void Renderer::CastRaysBasic()
     {
-        // TODO: display in minimap
+        rays = std::vector<SDL_Point>(settings.framebufferWidth * 2);
         Map *map = Game::Get().systems.map.get();
         Vec2f playerPos = map->playerPos;
         Vec2f dir = map->dir;
@@ -169,8 +197,14 @@ namespace KrisRaycaster
                 Vec2f rayPos = playerPos + rayDir * distance;
                 int mapX = static_cast<int>(rayPos.x);
                 int mapY = static_cast<int>(rayPos.y);
-                if (Game::Get().systems.map->Get(mapX, mapY) != 0)
+                int wall = map->Get(mapX, mapY);
+                if (wall != 0)
                 {
+                    int pixelX = floor((rayPos.x / mapSize) * settings.framebufferWidth);
+                    int pixelY = floor((rayPos.y / mapSize) * settings.framebufferHeight);
+                    SDL_Point p = {pixelX, pixelY};
+                    rays[x] = {static_cast<int>(rayDir.x), static_cast<int>(rayDir.y)};
+                    rays[x + 1] = p;
                     break;
                 }
                 distance += settings.rayIncrement;
@@ -209,14 +243,6 @@ namespace KrisRaycaster
 
     void Renderer::DrawFrame()
     {
-        for (const auto &item: items)
-        {
-            /*
-            SDL_LockTexture(framebufferTexture, nullptr, &item.pixels, &item.pitch);
-
-            SDL_UnlockTexture(framebufferTexture);
-             */
-        }
         CastRaysBasic();
     }
 
@@ -231,6 +257,7 @@ namespace KrisRaycaster
         // draw raycasted scene
         SDL_UpdateTexture(framebufferTexture, nullptr, framebuffer.data(),
                           static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
+
         SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
         SDL_RenderPresent(sdlRend);
     }

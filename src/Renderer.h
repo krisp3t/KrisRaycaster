@@ -16,7 +16,6 @@ namespace KrisRaycaster
         int screenHeight = 720;
         int framebufferWidth = screenWidth / 2;
         int framebufferHeight = screenHeight;
-        float fov = 60.0;
         float rayIncrement = 0.01;
     };
 
@@ -54,10 +53,12 @@ namespace KrisRaycaster
 
         RendererSettings settings;
         SDL_Renderer *sdlRend;
+        std::vector<Texture> items; // TODO: remove storage
         std::vector<uint32_t> framebuffer;
+        std::vector<SDL_Point> rays;
         SDL_Texture *framebufferTexture;
         SDL_Texture *minimapTexture;
-        std::vector<Texture> items;
+
 
         void BeforeFrame();
 

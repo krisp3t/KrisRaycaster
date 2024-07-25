@@ -47,6 +47,14 @@ struct Vec<2, int>
         return result;
     }
 
+    Vec<2, int> operator+=(const Vec<2, int> &other) const
+    {
+        Vec<2, int> result{};
+        result.x = this->x + other.x;
+        result.y = this->y + other.y;
+        return result;
+    }
+
     Vec<2, int> operator*(int scalar) const
     {
         Vec<2, int> result{};
@@ -77,6 +85,14 @@ struct Vec<2, float>
         return result;
     }
 
+    Vec<2, float> operator+(float other) const
+    {
+        Vec<2, float> result{};
+        result.x = this->x + other;
+        result.y = this->y + other;
+        return result;
+    }
+    
     Vec<2, float> operator-(const Vec<2, float> &other) const
     {
         Vec<2, float> result{};
