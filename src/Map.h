@@ -23,6 +23,9 @@ namespace KrisRaycaster
 
         [[nodiscard]] bool IsEmpty(size_t i, size_t j) const;
 
+        int GetSize() const;
+
+
         Vec2f playerPos;
         Vec2f dir;
         Vec2f cameraPlane;
@@ -30,9 +33,10 @@ namespace KrisRaycaster
         std::shared_ptr<Texture> ceilTexture;
         Texture *minimapTexture;
     private:
-        int w, h;
+        int rowLength;
         std::vector<uint_fast8_t> data; // map data
 
         void Render();
+
     };
 }

@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Map.h"
 #include "Texture.h"
+#include "Game.h"
 
 namespace KrisRaycaster
 {
@@ -17,6 +18,7 @@ namespace KrisRaycaster
     int Renderer::Init(SDL_Renderer *rend)
     {
         sdlRend = rend;
+        framebuffer = std::vector<uint32_t>(settings.framebufferWidth * settings.framebufferHeight, 0);
         framebufferTexture = SDL_CreateTexture(
                 sdlRend,
                 SDL_PIXELFORMAT_ABGR8888,
@@ -102,6 +104,47 @@ namespace KrisRaycaster
         return &items.back();
     }
 
+    // Basic (slow) implementation - just go along the rays with increments until you hit wall
+    void Renderer::CastRaysBasic()
+    {
+        // TODO: display in minimap
+        float rayAngle = settings.playerAngle - (settings.fov / 2); // if FOV 60, then [-30, 30]
+        int mapSize = Game::Get().systems.map->GetSize();
+        for (int i = 0; i < settings.framebufferWidth; i++)
+        {
+            Vec2 ray;
+
+            float dx = cos(rayAngle);
+            float dy = sin(rayAngle);
+            int wall = 0;
+            while (wall == 0)
+            {
+                ray = {
+                        static_cast<int>(floor(settings.playerPos.x + dx)),
+                        static_cast<int>(floor(settings.playerPos.y + dy))
+                };
+                wall = Game::Get().systems.map->Get(ray.x / mapSize, ray.y / mapSize);
+                dx += cos(rayAngle) / settings.rayPrecision;
+                dy += sin(rayAngle) / settings.rayPrecision;
+                rayAngle += settings.rayIncrementAngle;
+            }
+            float distance = sqrt(pow(ray.x, 2) + pow(ray.y, 2));
+            int wallHeight = floor(settings.framebufferHeight / distance);
+            SDL_Log("Drawing line at %d with height %d, distance %f, wall: (%d, %d)", i, wallHeight, distance, ray.x,
+                    ray.y);
+
+            DrawVLine(i, wallHeight);
+        }
+    }
+
+    void Renderer::DrawVLine(int x, int height)
+    {
+        for (int y = settings.framebufferHeight - 1; y >= height; y--)
+        {
+            framebuffer[y * settings.framebufferWidth + x] = 0xFF0000FF;
+        }
+    }
+
     void Renderer::BeforeFrame()
     {
         SDL_SetRenderTarget(sdlRend, nullptr);
@@ -119,6 +162,7 @@ namespace KrisRaycaster
             SDL_UnlockTexture(framebufferTexture);
              */
         }
+        CastRaysBasic();
     }
 
     void Renderer::Render()
@@ -128,6 +172,8 @@ namespace KrisRaycaster
         // draw minimap
         SDL_RenderCopy(sdlRend, minimapTexture, nullptr, &leftRec);
         // draw raycasted scene
+        SDL_UpdateTexture(framebufferTexture, nullptr, framebuffer.data(),
+                          static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
         SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
         SDL_RenderPresent(sdlRend);
     }

@@ -3,6 +3,13 @@
 
 namespace KrisRaycaster
 {
+    Game &Game::Get()
+    {
+        static Game instance;
+        return instance;
+    }
+
+
     void Game::ProcessInput()
     {
         SDL_Event event;
@@ -34,6 +41,8 @@ namespace KrisRaycaster
     {
         systems.map = std::make_unique<Map>("./map/minecraft");
     }
+
+
 }
 
 

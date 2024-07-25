@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <vector>
+#include "Math.h"
 
 namespace KrisRaycaster
 {
@@ -15,12 +16,15 @@ namespace KrisRaycaster
         int screenHeight = 720;
         int framebufferWidth = screenWidth / 2;
         int framebufferHeight = screenHeight;
-        int fov;
+        float fov = 60.0;
         int mapWidth;
         int mapHeight;
         int tileSize;
-        int numRays;
+        float rayIncrementAngle = fov / framebufferWidth;
+        int rayPrecision = 64;
         double depth;
+        Vec2 playerPos = {7, 14}; // TODO: move out of here!
+        float playerAngle = 0.0; // TODO: move out of here!
     };
 
     class Renderer
@@ -57,6 +61,7 @@ namespace KrisRaycaster
 
         RendererSettings settings;
         SDL_Renderer *sdlRend;
+        std::vector<uint32_t> framebuffer;
         SDL_Texture *framebufferTexture;
         SDL_Texture *minimapTexture;
         std::vector<Texture> items;
@@ -69,5 +74,8 @@ namespace KrisRaycaster
         SDL_Rect rightRec;
 
 
+        void CastRaysBasic();
+
+        void DrawVLine(int x, int height);
     };
 }

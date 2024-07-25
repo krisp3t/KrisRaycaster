@@ -24,6 +24,12 @@ namespace KrisRaycaster
     public:
         Game();
 
+        Game(const Game &) = delete;
+
+        Game &operator=(const Game &) = delete;
+
+        static Game &Get();
+
         void ProcessInput();
 
         void Update(double deltaTime);
@@ -33,8 +39,8 @@ namespace KrisRaycaster
         [[nodiscard]] bool HasQuit() const;
 
 
-    private:
         GameSystems systems;
+    private:
         bool hasQuit = false;
     };
 }
