@@ -42,14 +42,18 @@ namespace KrisRaycaster
         // TODO: rewrite to use SDL_Texture or vector<uint32_t>
         // std::vector<uint32_t> img; // textures storage container
 
+
+
         [[nodiscard]] SDL_Rect GetRect(int ix) const;
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
 
         SDL_Texture *img; // TODO: private
+        uint32_t Get() const;
 
 
     private:
+
 
     };
 }

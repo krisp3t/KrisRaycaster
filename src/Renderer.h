@@ -1,14 +1,17 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include "Math.h"
+
 
 namespace KrisRaycaster
 {
     class Texture;
 
     class TextureFormat;
+
 
     struct RendererSettings
     {
@@ -35,7 +38,7 @@ namespace KrisRaycaster
         int Init(SDL_Renderer *rend);
 
 
-        void Render();
+        void Render(double d);
 
         void Update();
 
@@ -58,6 +61,7 @@ namespace KrisRaycaster
         std::vector<SDL_Point> rays;
         SDL_Texture *framebufferTexture;
         SDL_Texture *minimapTexture;
+        TTF_Font *font;
 
 
         void BeforeFrame();

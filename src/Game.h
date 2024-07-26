@@ -40,6 +40,9 @@ namespace KrisRaycaster
 
 
         GameSystems systems;
+
+        void Render(double deltaTime);
+
     private:
         bool hasQuit = false;
 

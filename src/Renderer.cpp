@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <cassert>
+#include <sstream>
 #include "Renderer.h"
 #include "Map.h"
 #include "Texture.h"
@@ -33,6 +35,13 @@ namespace KrisRaycaster
         }
         leftRec = SDL_Rect{0, 0, settings.framebufferWidth, settings.framebufferHeight};
         rightRec = SDL_Rect{settings.framebufferWidth, 0, settings.framebufferWidth, settings.framebufferHeight};
+        TTF_Init();
+        font = TTF_OpenFont("./assets/ttf/roboto-mono/RobotoMono-SemiBold.ttf", 24);
+        if (!font)
+        {
+            std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
+            return -1;
+        }
         return 0;
     }
 
@@ -173,25 +182,28 @@ namespace KrisRaycaster
             Vec2 start = MapToScreen(playerPos + rayDir, Vec2{settings.framebufferWidth, settings.framebufferHeight},
                                      mapSize);
             float distance = 1;
-            Vec2f rayPos = playerPos + rayDir * distance;
-
+            Vec2f rayPos;
+            Texture *wallTex;
+            int wall = 0;
             while (distance < 100)
             {
                 rayPos = playerPos + rayDir * distance;
                 int mapX = static_cast<int>(rayPos.x);
                 int mapY = static_cast<int>(rayPos.y);
-                int wall = map->Get(mapX, mapY);
+                wall = map->Get(mapX, mapY);
                 if (wall != 0)
                 {
                     break;
                 }
                 distance += settings.rayIncrement;
             }
-            Vec2 collisionPx = MapToScreen(rayPos, Vec2{settings.framebufferWidth, settings.framebufferHeight},
+            Vec2 collisionPx = MapToScreen(rayPos,
+                                           Vec2{settings.framebufferWidth, settings.framebufferHeight},
                                            mapSize);
             rays.push_back({start.x, start.y});
             rays.push_back({collisionPx.x, collisionPx.y});
             int wallHeight = floor(settings.framebufferHeight / Fmax(distance, 1.0));
+            //uint32_t a = map->GetTex(wall);
             // ceiling
             DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
@@ -228,7 +240,7 @@ namespace KrisRaycaster
         CastRaysBasic();
     }
 
-    void Renderer::Render()
+    void Renderer::Render(double deltaTime)
     {
         BeforeFrame();
         DrawFrame();
@@ -239,8 +251,19 @@ namespace KrisRaycaster
         // draw raycasted scene
         SDL_UpdateTexture(framebufferTexture, nullptr, framebuffer.data(),
                           static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
-
         SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
+        // display fps and resolution
+        int fps = floor(1.0f / deltaTime);
+        int time = floor(deltaTime * 1000);
+        std::ostringstream stringStream;
+        stringStream << fps << " fps (" << time << " ms)" << "\n" << settings.framebufferWidth << "x"
+                     << settings.framebufferHeight;
+        std::string copyOfStr = stringStream.str();
+        SDL_Surface *message = TTF_RenderText_Solid(font, copyOfStr.c_str(), {255, 255, 255});
+        SDL_Texture *messageTexture = SDL_CreateTextureFromSurface(sdlRend, message);
+        SDL_Rect messageRect = {settings.framebufferWidth + 16, 0, message->w, message->h};
+        SDL_RenderCopy(sdlRend, messageTexture, nullptr, &messageRect);
+
         SDL_RenderPresent(sdlRend);
     }
 

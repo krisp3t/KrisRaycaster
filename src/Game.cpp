@@ -44,9 +44,9 @@ namespace KrisRaycaster
 
     }
 
-    void Game::Render()
+    void Game::Render(double deltaTime)
     {
-        Renderer::Get().Render(); // TODO: avoid static call?
+        Renderer::Get().Render(deltaTime); // TODO: avoid static call?
     }
 
     bool Game::HasQuit() const

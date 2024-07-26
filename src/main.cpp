@@ -67,14 +67,15 @@ namespace KrisRaycaster
             deltaTime = (time - oldTime) / 1000.0;
             game->ProcessInput(deltaTime);
             game->Update(deltaTime);
-            game->Render();
+            game->Render(deltaTime);
             oldTime = time;
-
             // Cap frame rate (optional)
+            /*
             if (deltaTime < (1.0f / 60.0f))
             {
                 SDL_Delay((Uint32) (((1.0f / 60.0f) - deltaTime) * 1000.0f));
             }
+             */
         }
         SDL_DestroyRenderer(sdlRend);
         SDL_DestroyWindow(window);

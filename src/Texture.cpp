@@ -59,5 +59,13 @@ namespace KrisRaycaster
         return rect;
     }
 
-
+    uint32_t Texture::Get() const
+    {
+        void *pixels;
+        SDL_LockTexture(img, nullptr, &pixels, nullptr);
+        memcpy(pixels, img, format.spriteW * format.spriteH * sizeof(uint32_t));
+        auto *p = (uint32_t *) pixels;
+        SDL_UnlockTexture(img);
+        return *p;
+    }
 }

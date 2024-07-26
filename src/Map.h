@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Math.h"
+#include "SDL_rect.h"
 
 
 namespace KrisRaycaster
@@ -39,6 +40,9 @@ namespace KrisRaycaster
 
         Vec2f GetPlayer();
 
+        SDL_Rect *GetTexCol(int spriteIx, int x) const;
+
+        uint32_t GetTex(int spriteIx) const;
 
     private:
         int rowLength;

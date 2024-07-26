@@ -27,6 +27,17 @@ namespace KrisRaycaster
         return data[y * rowLength + x];
     }
 
+    SDL_Rect *Map::GetTexCol(int spriteIx, int x) const
+    {
+        //return floorTexture->GetColumn(spriteIx, x, 0);
+        return nullptr;
+    }
+
+    uint32_t Map::GetTex(int spriteIx) const
+    {
+        return floorTexture->Get();
+    }
+
     int Map::GetSize() const
     {
         return rowLength;
