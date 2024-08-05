@@ -25,16 +25,13 @@ namespace KrisRaycaster
 
     class Texture
     {
-        friend class Renderer;
-
     public:
         Texture(
                 const std::string &filename,
-                TextureFormat format,
-                SDL_Renderer *r
+                TextureFormat format
         );
 
-        Texture(TextureFormat format, SDL_Renderer *r);
+        Texture(TextureFormat format);
 
         ~Texture();
 
@@ -42,18 +39,11 @@ namespace KrisRaycaster
         // TODO: rewrite to use SDL_Texture or vector<uint32_t>
         // std::vector<uint32_t> img; // textures storage container
 
-
-
         [[nodiscard]] SDL_Rect GetRect(int ix) const;
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
 
         SDL_Surface *img; // TODO: private
         uint32_t Get() const;
-
-
-    private:
-
-
     };
 }

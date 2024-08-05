@@ -98,7 +98,7 @@ namespace KrisRaycaster
             TextureFormat format
     )
     {
-        auto t = Texture{format, sdlRend};
+        auto t = Texture{format};
         items.push_back(t);
         return &items.back();
     }
@@ -108,7 +108,7 @@ namespace KrisRaycaster
             TextureFormat format
     )
     {
-        auto t = Texture{filename, format, sdlRend};
+        auto t = Texture{filename, format};
         items.push_back(t);
         return &items.back();
     }
@@ -162,7 +162,7 @@ namespace KrisRaycaster
     }
 
     // Basic (slow) implementation - just go along the rays with increments until you hit wall
-    void Renderer::CastRaysBasic()
+    void Renderer::CastRaysStep()
     {
         rays = std::vector<SDL_Point>{};
         rays.reserve(settings.framebufferWidth * 2);
@@ -171,8 +171,7 @@ namespace KrisRaycaster
         Vec2f dir = map->dir;
         Vec2f cameraPlane = map->cameraPlane;
         int mapSize = Game::Get().systems.map->GetSize();
-        //int rectW = settings.framebufferWidth / mapSize;
-        //int rectH = settings.framebufferHeight / mapSize;
+        int maxDistance = std::sqrt(mapSize * mapSize + mapSize * mapSize);
         for (int x = 0; x < settings.framebufferWidth; x++)
         {
             // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
@@ -183,9 +182,8 @@ namespace KrisRaycaster
                                      mapSize);
             float distance = 1;
             Vec2f rayPos;
-            Texture *wallTex;
             int wall = 0;
-            while (distance < 100)
+            while (distance < maxDistance)
             {
                 rayPos = playerPos + rayDir * distance;
                 int mapX = static_cast<int>(rayPos.x);
@@ -203,17 +201,65 @@ namespace KrisRaycaster
             rays.push_back({start.x, start.y});
             rays.push_back({collisionPx.x, collisionPx.y});
             int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
-            //uint32_t a = map->GetTex(wall);
             // ceiling
-            //DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
+            DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
-            //DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
             // floor
-            //DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
-            //          settings.framebufferHeight / 2 - wallHeight / 2,
-            //          0xFFFF0000);
+            DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
+                      settings.framebufferHeight / 2 - wallHeight / 2,
+                      0xFFFF0000);
         }
     }
+
+//    void Renderer::CastRaysDDA()
+//    {
+//        rays = std::vector<SDL_Point>{};
+//        rays.reserve(settings.framebufferWidth * 2);
+//        Map *map = Game::Get().systems.map.get();
+//        Vec2f playerPos = map->playerPos;
+//        Vec2f dir = map->dir;
+//        Vec2f cameraPlane = map->cameraPlane;
+//        int mapSize = Game::Get().systems.map->GetSize();
+//        for (int x = 0; x < settings.framebufferWidth; x++)
+//        {
+//            // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
+//            float cameraX = 2 * x / static_cast<float>(settings.framebufferWidth) - 1; // x in camera space [-1, 1]
+//            Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
+//                            dir.y + cameraPlane.y * cameraX};
+//            Vec2 start = MapToScreen(playerPos + rayDir, Vec2{settings.framebufferWidth, settings.framebufferHeight},
+//                                     mapSize);
+//            Vec2 mapSquare{};
+//
+//            int wall = 0;
+//            while (distance < 100)
+//            {
+//                rayPos = playerPos + rayDir * distance;
+//                int mapX = static_cast<int>(rayPos.x);
+//                int mapY = static_cast<int>(rayPos.y);
+//                wall = map->Get(mapX, mapY);
+//                if (wall != 0)
+//                {
+//                    break;
+//                }
+//                distance += settings.rayIncrement;
+//            }
+//            Vec2 collisionPx = MapToScreen(rayPos,
+//                                           Vec2{settings.framebufferWidth, settings.framebufferHeight},
+//                                           mapSize);
+//            rays.push_back({start.x, start.y});
+//            rays.push_back({collisionPx.x, collisionPx.y});
+//            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
+//            // ceiling
+//            DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
+//            // walls
+//            DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+//            // floor
+//            DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
+//                      settings.framebufferHeight / 2 - wallHeight / 2,
+//                      0xFFFF0000);
+//        }
+//    }
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
@@ -237,7 +283,7 @@ namespace KrisRaycaster
 
     void Renderer::DrawFrame()
     {
-        CastRaysBasic();
+        CastRaysStep();
     }
 
     void Renderer::Render(double deltaTime)
@@ -263,7 +309,8 @@ namespace KrisRaycaster
         SDL_Texture *messageTexture = SDL_CreateTextureFromSurface(sdlRend, message);
         SDL_Rect messageRect = {settings.framebufferWidth + 16, 0, message->w, message->h};
         SDL_RenderCopy(sdlRend, messageTexture, nullptr, &messageRect);
-
+        SDL_FreeSurface(message);
+        SDL_DestroyTexture(messageTexture); // allocations every frame are slow
         SDL_RenderPresent(sdlRend);
     }
 

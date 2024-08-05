@@ -8,8 +8,7 @@ namespace KrisRaycaster
 {
     // TODO: don't hardcode target
     Texture::Texture(
-            TextureFormat format,
-            SDL_Renderer *r
+            TextureFormat format
     ) : format(format)
     {
         img = SDL_CreateRGBSurfaceWithFormat(
@@ -28,8 +27,7 @@ namespace KrisRaycaster
 
     Texture::Texture(
             const std::string &filename,
-            TextureFormat format,
-            SDL_Renderer *r
+            TextureFormat format
     ) : format(format)
     {
         img = IMG_Load(filename.c_str());
@@ -42,8 +40,7 @@ namespace KrisRaycaster
 
     Texture::~Texture()
     {
-        // TODO: Destroy img
-
+        SDL_FreeSurface(img);
     }
 
     SDL_Rect Texture::GetRect(int ix) const

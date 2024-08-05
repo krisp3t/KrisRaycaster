@@ -10,7 +10,7 @@ namespace KrisRaycaster
 {
     class Texture;
 
-    class TextureFormat;
+    struct TextureFormat;
 
 
     struct RendererSettings
@@ -72,9 +72,10 @@ namespace KrisRaycaster
         SDL_Rect rightRec;
 
 
-        void CastRaysBasic();
+        void CastRaysStep();
 
-        void DrawVLine(int x, int height);
+        void CastRaysDDA();
+
 
         void DrawVLine(int x, int height, uint32_t color);
 
