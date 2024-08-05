@@ -12,13 +12,13 @@ namespace KrisRaycaster
             SDL_Renderer *r
     ) : format(format)
     {
-        img = SDL_CreateTexture(
-                r,
-                SDL_PIXELFORMAT_ABGR8888,
-                SDL_TEXTUREACCESS_TARGET,
+        img = SDL_CreateRGBSurfaceWithFormat(
+                0,
                 format.spriteW * format.rowCount,
-                format.spriteH * format.count / format.rowCount
-        );
+
+                format.spriteH * format.count / format.rowCount,
+                32,
+                format.format);
         if (!img)
         {
             std::cerr << "Failed to create texture : " << SDL_GetError() << std::endl;
@@ -32,7 +32,7 @@ namespace KrisRaycaster
             SDL_Renderer *r
     ) : format(format)
     {
-        img = IMG_LoadTexture(r, filename.c_str());
+        img = IMG_Load(filename.c_str());
         if (!img)
         {
             std::cerr << "Error in IMG_Load: " << IMG_GetError() << std::endl;
@@ -57,15 +57,5 @@ namespace KrisRaycaster
         rect.w = format.spriteW;
         rect.h = format.spriteH;
         return rect;
-    }
-
-    uint32_t Texture::Get() const
-    {
-        void *pixels;
-        SDL_LockTexture(img, nullptr, &pixels, nullptr);
-        memcpy(pixels, img, format.spriteW * format.spriteH * sizeof(uint32_t));
-        auto *p = (uint32_t *) pixels;
-        SDL_UnlockTexture(img);
-        return *p;
     }
 }

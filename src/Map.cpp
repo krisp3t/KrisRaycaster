@@ -33,11 +33,6 @@ namespace KrisRaycaster
         return nullptr;
     }
 
-    uint32_t Map::GetTex(int spriteIx) const
-    {
-        return floorTexture->Get();
-    }
-
     int Map::GetSize() const
     {
         return rowLength;
@@ -60,7 +55,7 @@ namespace KrisRaycaster
 
     void Map::StrafePlayer(float angle)
     {
-        dir = dir.Rotate(angle);
-        cameraPlane = cameraPlane.Rotate(angle);
+        dir.Rotate(angle);
+        cameraPlane.Rotate(angle);
     }
 }

@@ -83,7 +83,7 @@ namespace KrisRaycaster
                 dest.w -= tileBorder * 2;
                 dest.h -= tileBorder * 2;
                 SDL_Rect src = floorTex.GetRect(tile);
-                SDL_RenderCopy(sdlRend, floorTex.img, &src, &dest);
+                //SDL_RenderCopy(sdlRend, floorTex.img, &src, &dest);
             }
             ix++;
         }
@@ -202,16 +202,16 @@ namespace KrisRaycaster
                                            mapSize);
             rays.push_back({start.x, start.y});
             rays.push_back({collisionPx.x, collisionPx.y});
-            int wallHeight = floor(settings.framebufferHeight / Fmax(distance, 1.0));
+            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
             //uint32_t a = map->GetTex(wall);
             // ceiling
-            DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
+            //DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
-            DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            //DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
             // floor
-            DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
-                      settings.framebufferHeight / 2 - wallHeight / 2,
-                      0xFFFF0000);
+            //DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
+            //          settings.framebufferHeight / 2 - wallHeight / 2,
+            //          0xFFFF0000);
         }
     }
 

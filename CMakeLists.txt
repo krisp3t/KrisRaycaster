@@ -3,8 +3,8 @@ project(KrisRaycaster)
 
 # set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TARGET_PLATFORM "STM32" CACHE STRING "Target platform for build")
-set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS STM32 DESKTOP)
+set(TARGET_PLATFORM "DESKTOP" CACHE STRING "Target platform for build")
+set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS DESKTOP)
 
 # Common source files
 #set(COMMON_SOURCES
@@ -36,12 +36,9 @@ enable_cxx_compiler_flag_if_supported("-Wextra")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 enable_cxx_compiler_flag_if_supported("-std=c++17")
 enable_cxx_compiler_flag_if_supported("-O3")
+add_compile_definitions(_USE_MATH_DEFINES)
 
-if (TARGET_PLATFORM STREQUAL "STM32")
-    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/stm32_toolchain.cmake)
-    add_executable(${PROJECT_NAME} ${COMMON_SOURCES} src/main_stm32.c)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_STM32 STM32H750xx)
-elseif (TARGET_PLATFORM STREQUAL "DESKTOP")
+if (TARGET_PLATFORM STREQUAL "DESKTOP")
     find_package(SDL2 REQUIRED)
     add_executable(${PROJECT_NAME} ${SOURCES})
     target_link_libraries(${PROJECT_NAME}

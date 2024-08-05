@@ -48,7 +48,7 @@ namespace KrisRaycaster
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
 
-        SDL_Texture *img; // TODO: private
+        SDL_Surface *img; // TODO: private
         uint32_t Get() const;
 
 
