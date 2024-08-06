@@ -228,14 +228,18 @@ namespace KrisRaycaster
                             1; // screenCol in camera space [-1, 1]
             Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
                             dir.y + cameraPlane.y * cameraX};
-            Vec2f start = playerPos + rayDir;
+            Vec2f start = playerPos;
 
             int wall = 0;
             float mapX, mapY;
             int stepX = rayDir.x > 0 ? 1 : -1;
             int stepY = rayDir.y > 0 ? 1 : -1;
-            float xFactor = rayDir.x > 0 ? ceil(start.x) - start.x : start.x - floor(start.x);
-            float yFactor = rayDir.y > 0 ? ceil(start.y) - start.y : start.y - floor(start.y);
+            float xFactor = rayDir.x > 0 ?
+                            (ceil(start.x) - start.x) / rayDir.x :
+                            (floor(start.x) - start.x) / rayDir.x;
+            float yFactor = rayDir.y > 0 ?
+                            (ceil(start.y) - start.y) / rayDir.y :
+                            (floor(start.y) - start.y) / rayDir.y;
             bool hitXSide = false; // true if hitYSide
             // DDA only in one direction, if completely horizontal / vertical ray
             if (rayDir.x == 0)
@@ -251,14 +255,14 @@ namespace KrisRaycaster
             {
                 if (xFactor < yFactor)
                 {
-                    mapX = start.x + rayDir.x * xFactor;
-                    mapY = start.y + rayDir.y * xFactor;
+                    mapX = playerPos.x + rayDir.x * xFactor;
+                    mapY = playerPos.y + rayDir.y * xFactor;
                     xFactor += stepX / rayDir.x;
                     hitXSide = true;
                 } else
                 {
-                    mapX = start.x + rayDir.x * yFactor;
-                    mapY = start.y + rayDir.y * yFactor;
+                    mapX = playerPos.x + rayDir.x * yFactor;
+                    mapY = playerPos.y + rayDir.y * yFactor;
                     yFactor += stepY / rayDir.y;
                     hitXSide = false;
                 }
@@ -269,13 +273,17 @@ namespace KrisRaycaster
                 }
             }
             Vec2f collision = {mapX, mapY};
+            Vec2 startPx = MapToScreen(start, Vec2{settings.framebufferWidth, settings.framebufferHeight}, mapSize);
+            Vec2 collisionPx = MapToScreen(collision,
+                                           Vec2{settings.framebufferWidth, settings.framebufferHeight},
+                                           mapSize);
             float distance = (collision - start).Length();
             int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
+            rays.push_back({startPx.x, startPx.y});
+            rays.push_back({collisionPx.x, collisionPx.y});
 
-            SDL_Log("Collision: %f, %f, start: %f %f, col: %d, wall: %x, factor: %f, distance: %f", collision.x,
-                    collision.y, (collision - start).x, (collision - start).y,
-                    screenCol, wall,
-                    hitXSide ? xFactor : yFactor, distance);
+            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
+                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
             // ceiling
             DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
