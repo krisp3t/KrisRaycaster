@@ -231,32 +231,30 @@ namespace KrisRaycaster
             Vec2f start = playerPos + rayDir;
 
             int wall = 0;
-            float xFactor = (1.0f - modff(start.x, nullptr)); // scaling factor of rayDir, that x to get to next int
-            float yFactor = (1.0f - modff(start.y, nullptr));
-            float rayDistX = xFactor / rayDir.x; // distance of ray, when x=1,2,3... (+ initial offset)
-            float rayDistY = yFactor / rayDir.y;
+            float xFactor = (ceil(start.x) - start.x) / rayDir.x; // scaling factor of rayDir, that x to get to next int
+            float yFactor = (ceil(start.y) - start.y) / rayDir.y;
             int mapX, mapY;
             // TODO: prevent infinite loop?
             while (true)
             {
-                if (rayDistX < rayDistY)
+                if (xFactor < yFactor)
                 {
                     mapX = static_cast<int>(start.x + rayDir.x * xFactor);
                     mapY = static_cast<int>(start.y + rayDir.y * xFactor);
-                    xFactor += 1.0f;
+                    xFactor += 1.0f / rayDir.x;
                 } else
                 {
                     mapX = static_cast<int>(start.x + rayDir.x * yFactor);
                     mapY = static_cast<int>(start.y + rayDir.y * yFactor);
-                    yFactor += 1.0f;
+                    yFactor += 1.0f / rayDir.y;
                 }
-                wall = map->Get(mapX, mapY);
+                wall = map->Get(mapX - 1, mapY - 1);
                 if (wall != 0)
                 {
                     break;
                 }
             }
-            SDL_Log("Wall: %d", wall);
+            SDL_Log("MapX: %d, MapY: %d, Wall: %x", mapX, mapY, wall);
             // walls
             //DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
         }

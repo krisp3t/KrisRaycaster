@@ -4,14 +4,136 @@
 #include <array>
 #include <iostream>
 
-
 template<typename T, std::size_t N>
-class Vec
+class Vec;
+
+template<typename T>
+class Vec<T, 2>
 {
 public:
     union
     {
-        std::array<T, N> e;
+        std::array<T, 2> e;
+        struct
+        {
+            T x, y;
+        };
+        struct
+        {
+            T r, g;
+        };
+    };
+
+    // Default ctor - Vector.Zero
+    Vec() : e{}
+    {}
+
+    // Ctor with specified values
+    Vec(T x, T y) : e{x, y}
+    {}
+
+    T operator[](std::size_t i) const
+    { return e[i]; }
+
+    T &operator[](std::size_t i)
+    { return e[i]; }
+
+    [[nodiscard]] T LengthSquared() const
+    {
+        T sum = 0;
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            sum += e[i] * e[i];
+        }
+        return sum;
+    }
+
+    [[nodiscard]] T Length() const
+    {
+        return std::sqrt(LengthSquared());
+    }
+
+    Vec &operator+=(const Vec &v)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] += v.e[i];
+        }
+        return *this;
+    }
+
+    Vec &operator+=(T t)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] += t;
+        }
+        return *this;
+    }
+
+    Vec &operator-=(const Vec &v)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] -= v.e[i];
+        }
+        return *this;
+    }
+
+    Vec &operator-=(T t)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] -= t;
+        }
+        return *this;
+    }
+
+    Vec &operator*=(const Vec &v)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] *= v.e[i];
+        }
+        return *this;
+    }
+
+    Vec &operator*=(T t)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] *= t;
+        }
+        return *this;
+    }
+
+    Vec &operator/=(T t)
+    {
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            e[i] /= t;
+        }
+        return *this;
+    }
+
+    void Rotate(float angle)
+    {
+        float s = std::sin(angle);
+        float c = std::cos(angle);
+        float newX = x * c - y * s;
+        float newY = x * s + y * c;
+        x = newX;
+        y = newY;
+    }
+};
+
+template<typename T>
+class Vec<T, 3>
+{
+public:
+    union
+    {
+        std::array<T, 3> e;
         struct
         {
             T x, y, z;
@@ -27,15 +149,8 @@ public:
     {}
 
     // Ctor with specified values
-    Vec(T x, T y) : e{x, y}
-    {
-        static_assert(N == 2, "Vec2 ctor with 2 values");
-    }
-
     Vec(T x, T y, T z) : e{x, y, z}
-    {
-        static_assert(N == 3, "Vec3 ctor with 3 values");
-    }
+    {}
 
     T operator[](std::size_t i) const
     { return e[i]; }
@@ -46,7 +161,7 @@ public:
     [[nodiscard]] T LengthSquared() const
     {
         T sum = 0;
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             sum += e[i] * e[i];
         }
@@ -60,7 +175,7 @@ public:
 
     Vec &operator+=(const Vec &v)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] += v.e[i];
         }
@@ -69,7 +184,7 @@ public:
 
     Vec &operator+=(T t)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] += t;
         }
@@ -78,7 +193,7 @@ public:
 
     Vec &operator-=(const Vec &v)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] -= v.e[i];
         }
@@ -87,7 +202,7 @@ public:
 
     Vec &operator-=(T t)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] -= t;
         }
@@ -96,7 +211,7 @@ public:
 
     Vec &operator*=(const Vec &v)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] *= v.e[i];
         }
@@ -105,7 +220,7 @@ public:
 
     Vec &operator*=(T t)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] *= t;
         }
@@ -114,23 +229,11 @@ public:
 
     Vec &operator/=(T t)
     {
-        for (std::size_t i = 0; i < N; ++i)
+        for (std::size_t i = 0; i < 3; ++i)
         {
             e[i] /= t;
         }
         return *this;
-    }
-
-    template<typename U = T>
-    typename std::enable_if<N == 2 && std::is_same<U, float>::value, void>::type
-    Rotate(float angle)
-    {
-        float s = std::sin(angle);
-        float c = std::cos(angle);
-        float newX = x * c - y * s;
-        float newY = x * s + y * c;
-        x = newX;
-        y = newY;
     }
 };
 
