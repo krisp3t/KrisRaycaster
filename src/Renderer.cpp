@@ -212,54 +212,55 @@ namespace KrisRaycaster
         }
     }
 
-//    void Renderer::CastRaysDDA()
-//    {
-//        rays = std::vector<SDL_Point>{};
-//        rays.reserve(settings.framebufferWidth * 2);
-//        Map *map = Game::Get().systems.map.get();
-//        Vec2f playerPos = map->playerPos;
-//        Vec2f dir = map->dir;
-//        Vec2f cameraPlane = map->cameraPlane;
-//        int mapSize = Game::Get().systems.map->GetSize();
-//        for (int x = 0; x < settings.framebufferWidth; x++)
-//        {
-//            // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
-//            float cameraX = 2 * x / static_cast<float>(settings.framebufferWidth) - 1; // x in camera space [-1, 1]
-//            Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
-//                            dir.y + cameraPlane.y * cameraX};
-//            Vec2 start = MapToScreen(playerPos + rayDir, Vec2{settings.framebufferWidth, settings.framebufferHeight},
-//                                     mapSize);
-//            Vec2 mapSquare{};
-//
-//            int wall = 0;
-//            while (distance < 100)
-//            {
-//                rayPos = playerPos + rayDir * distance;
-//                int mapX = static_cast<int>(rayPos.x);
-//                int mapY = static_cast<int>(rayPos.y);
-//                wall = map->Get(mapX, mapY);
-//                if (wall != 0)
-//                {
-//                    break;
-//                }
-//                distance += settings.rayIncrement;
-//            }
-//            Vec2 collisionPx = MapToScreen(rayPos,
-//                                           Vec2{settings.framebufferWidth, settings.framebufferHeight},
-//                                           mapSize);
-//            rays.push_back({start.x, start.y});
-//            rays.push_back({collisionPx.x, collisionPx.y});
-//            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
-//            // ceiling
-//            DrawVLine(x, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
-//            // walls
-//            DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
-//            // floor
-//            DrawVLine(x, settings.framebufferHeight / 2 + wallHeight / 2,
-//                      settings.framebufferHeight / 2 - wallHeight / 2,
-//                      0xFFFF0000);
-//        }
-//    }
+    void Renderer::CastRaysDDA()
+    {
+        rays = std::vector<SDL_Point>{};
+        rays.reserve(settings.framebufferWidth * 2);
+        Map *map = Game::Get().systems.map.get();
+        Vec2f playerPos = map->playerPos;
+        Vec2f dir = map->dir;
+        Vec2f cameraPlane = map->cameraPlane;
+        int mapSize = Game::Get().systems.map->GetSize();
+        for (int screenCol = 0; screenCol < settings.framebufferWidth; screenCol++)
+        {
+            // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
+            float cameraX = 2 * screenCol / static_cast<float>(settings.framebufferWidth) -
+                            1; // screenCol in camera space [-1, 1]
+            Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
+                            dir.y + cameraPlane.y * cameraX};
+            Vec2f start = playerPos + rayDir;
+
+            int wall = 0;
+            float xFactor = (1.0f - modff(start.x, nullptr)); // scaling factor of rayDir, that x to get to next int
+            float yFactor = (1.0f - modff(start.y, nullptr));
+            float rayDistX = xFactor / rayDir.x; // distance of ray, when x=1,2,3... (+ initial offset)
+            float rayDistY = yFactor / rayDir.y;
+            int mapX, mapY;
+            // TODO: prevent infinite loop?
+            while (true)
+            {
+                if (rayDistX < rayDistY)
+                {
+                    mapX = static_cast<int>(start.x + rayDir.x * xFactor);
+                    mapY = static_cast<int>(start.y + rayDir.y * xFactor);
+                    xFactor += 1.0f;
+                } else
+                {
+                    mapX = static_cast<int>(start.x + rayDir.x * yFactor);
+                    mapY = static_cast<int>(start.y + rayDir.y * yFactor);
+                    yFactor += 1.0f;
+                }
+                wall = map->Get(mapX, mapY);
+                if (wall != 0)
+                {
+                    break;
+                }
+            }
+            SDL_Log("Wall: %d", wall);
+            // walls
+            //DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+        }
+    }
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
