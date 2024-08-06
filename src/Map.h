@@ -27,9 +27,9 @@ namespace KrisRaycaster
         int GetSize() const;
 
 
-        Vec2f playerPos = {7, 14};
-        Vec2f dir = {-1, 0};
-        Vec2f cameraPlane = {0, 0.66}; // 2 * atan(0.66) = FOV 60
+        Vec2f playerPos = {2, 11};
+        Vec2f dir = {0, -1};
+        Vec2f cameraPlane = {0.66, 0}; // 2 * atan(0.66) = FOV 60
         Texture *floorTexture;
         std::shared_ptr<Texture> ceilTexture;
         Texture *minimapTexture;

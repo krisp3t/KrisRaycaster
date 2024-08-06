@@ -40,17 +40,12 @@ public:
 
     [[nodiscard]] T LengthSquared() const
     {
-        T sum = 0;
-        for (std::size_t i = 0; i < 2; ++i)
-        {
-            sum += e[i] * e[i];
-        }
-        return sum;
+        return x * x + y * y;
     }
 
     [[nodiscard]] T Length() const
     {
-        return std::sqrt(LengthSquared());
+        return abs(x * x + y * y);
     }
 
     Vec &operator+=(const Vec &v)
@@ -160,17 +155,12 @@ public:
 
     [[nodiscard]] T LengthSquared() const
     {
-        T sum = 0;
-        for (std::size_t i = 0; i < 3; ++i)
-        {
-            sum += e[i] * e[i];
-        }
-        return sum;
+        return x * x + y * y + z * z;
     }
 
     [[nodiscard]] T Length() const
     {
-        return std::sqrt(LengthSquared());
+        return abs(x * x + y * y + z * z);
     }
 
     Vec &operator+=(const Vec &v)
@@ -263,7 +253,15 @@ template<typename T, std::size_t N>
 inline Vec<T, N> operator-(const Vec<T, N> &v1, const Vec<T, N> &v2)
 {
     Vec<T, N> result = v1;
-    result += v2;
+    result -= v2;
+    return result;
+}
+
+template<typename T, std::size_t N>
+inline Vec<T, N> operator-(const Vec<T, N> &v, T t)
+{
+    Vec<T, N> result = v;
+    result -= t;
     return result;
 }
 

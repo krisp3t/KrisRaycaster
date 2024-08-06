@@ -231,32 +231,59 @@ namespace KrisRaycaster
             Vec2f start = playerPos + rayDir;
 
             int wall = 0;
-            float xFactor = (ceil(start.x) - start.x) / rayDir.x; // scaling factor of rayDir, that x to get to next int
-            float yFactor = (ceil(start.y) - start.y) / rayDir.y;
-            int mapX, mapY;
+            float mapX, mapY;
+            int stepX = rayDir.x > 0 ? 1 : -1;
+            int stepY = rayDir.y > 0 ? 1 : -1;
+            float xFactor = rayDir.x > 0 ? ceil(start.x) - start.x : start.x - floor(start.x);
+            float yFactor = rayDir.y > 0 ? ceil(start.y) - start.y : start.y - floor(start.y);
+            bool hitXSide = false; // true if hitYSide
+            // DDA only in one direction, if completely horizontal / vertical ray
+            if (rayDir.x == 0)
+            {
+                xFactor = 1e30; // will never be chosen
+            }
+            if (rayDir.y == 0)
+            {
+                yFactor = 1e30;
+            }
             // TODO: prevent infinite loop?
             while (true)
             {
                 if (xFactor < yFactor)
                 {
-                    mapX = static_cast<int>(start.x + rayDir.x * xFactor);
-                    mapY = static_cast<int>(start.y + rayDir.y * xFactor);
-                    xFactor += 1.0f / rayDir.x;
+                    mapX = start.x + rayDir.x * xFactor;
+                    mapY = start.y + rayDir.y * xFactor;
+                    xFactor += stepX / rayDir.x;
+                    hitXSide = true;
                 } else
                 {
-                    mapX = static_cast<int>(start.x + rayDir.x * yFactor);
-                    mapY = static_cast<int>(start.y + rayDir.y * yFactor);
-                    yFactor += 1.0f / rayDir.y;
+                    mapX = start.x + rayDir.x * yFactor;
+                    mapY = start.y + rayDir.y * yFactor;
+                    yFactor += stepY / rayDir.y;
+                    hitXSide = false;
                 }
-                wall = map->Get(mapX - 1, mapY - 1);
+                wall = map->Get(static_cast<int>(mapX), static_cast<int>(mapY));
                 if (wall != 0)
                 {
                     break;
                 }
             }
-            SDL_Log("MapX: %d, MapY: %d, Wall: %x", mapX, mapY, wall);
+            Vec2f collision = {mapX, mapY};
+            float distance = (collision - start).Length();
+            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
+
+            SDL_Log("Collision: %f, %f, start: %f %f, col: %d, wall: %x, factor: %f, distance: %f", collision.x,
+                    collision.y, (collision - start).x, (collision - start).y,
+                    screenCol, wall,
+                    hitXSide ? xFactor : yFactor, distance);
+            // ceiling
+            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
-            //DrawVLine(x, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
+            // floor
+            DrawVLine(screenCol, settings.framebufferHeight / 2 + wallHeight / 2,
+                      settings.framebufferHeight / 2 - wallHeight / 2,
+                      0xFFFF0000);
         }
     }
 
@@ -282,7 +309,8 @@ namespace KrisRaycaster
 
     void Renderer::DrawFrame()
     {
-        CastRaysStep();
+        //CastRaysStep();
+        CastRaysDDA();
     }
 
     void Renderer::Render(double deltaTime)
