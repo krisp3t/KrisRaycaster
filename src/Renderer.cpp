@@ -45,9 +45,45 @@ namespace KrisRaycaster
         return 0;
     }
 
-    bool Renderer::InitMinimap(const Texture &floorTex, const std::vector<uint_fast8_t> &layout)
+
+    size_t Renderer::CreateTexture(
+            TextureFormat format
+    )
+    {
+        auto t = Texture{format};
+        items.push_back(t);
+        return items.size() - 1;
+    }
+
+    size_t Renderer::CreateTexture(
+            const std::string &filename,
+            TextureFormat format
+    )
+    {
+        auto t = Texture{filename, format};
+        items.push_back(t);
+        return items.size() - 1;
+    }
+
+    size_t Renderer::CreateTexture(
+            const std::string &filename,
+            TextureFormat format,
+            SDL_Renderer &rend
+    )
+    {
+        auto t = Texture{filename, format, rend};
+        items.push_back(t);
+        return items.size() - 1;
+    }
+
+    bool Renderer::InitMinimap(const std::string &mapPath, const std::vector<uint_fast8_t> &layout)
     {
         const int tileBorder = 1;
+        // TODO: free wallTex
+        auto wallTexId = CreateTexture(mapPath + "/wall.png",
+                                       TextureFormat
+                                               {32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888}, *sdlRend);
+        Texture *wallTex = &items[wallTexId];
         minimapTexture = SDL_CreateTexture(
                 sdlRend,
                 SDL_PIXELFORMAT_ABGR8888,
@@ -55,11 +91,6 @@ namespace KrisRaycaster
                 settings.framebufferWidth,
                 settings.framebufferHeight
         );
-        if (!minimapTexture)
-        {
-            std::cerr << "Failed to create minimap texture : " << SDL_GetError() << std::endl;
-            return false;
-        }
         SDL_SetRenderTarget(sdlRend, minimapTexture);
         int ix = 0;
         int mapSize = layout.size();
@@ -82,36 +113,16 @@ namespace KrisRaycaster
                 dest.y += tileBorder;
                 dest.w -= tileBorder * 2;
                 dest.h -= tileBorder * 2;
-                SDL_Rect src = floorTex.GetRect(tile);
-                //SDL_RenderCopy(sdlRend, floorTex.img, &src, &dest);
+                SDL_Rect src = wallTex->GetRect(tile);
+                assert(wallTex->tx != nullptr);
+                SDL_RenderCopy(sdlRend, wallTex->tx, &src, &dest);
             }
             ix++;
         }
-        //SDL_Texture *t = SDL_CreateTextureFromSurface(sdlRend, floorTex.img);
-
-
         SDL_SetRenderTarget(sdlRend, nullptr);
         return true;
     }
 
-    Texture *Renderer::CreateTexture(
-            TextureFormat format
-    )
-    {
-        auto t = Texture{format};
-        items.push_back(t);
-        return &items.back();
-    }
-
-    Texture *Renderer::CreateTexture(
-            const std::string &filename,
-            TextureFormat format
-    )
-    {
-        auto t = Texture{filename, format};
-        items.push_back(t);
-        return &items.back();
-    }
 
     void Renderer::DrawPlayerMinimap()
     {
@@ -282,8 +293,8 @@ namespace KrisRaycaster
             rays.push_back({startPx.x, startPx.y});
             rays.push_back({collisionPx.x, collisionPx.y});
 
-            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
-                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
+//            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
+//                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
             // ceiling
             DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls

@@ -33,6 +33,14 @@ namespace KrisRaycaster
 
         Texture(TextureFormat format);
 
+        Texture::Texture(
+                TextureFormat format,
+                SDL_Renderer &rend
+        );
+
+
+        Texture(const std::string &filename, TextureFormat format, SDL_Renderer &rend);
+
         ~Texture();
 
         TextureFormat format;
@@ -43,7 +51,8 @@ namespace KrisRaycaster
 
         [[nodiscard]] SDL_Rect GetColumn(int textureIx, int i, int j) const;
 
-        SDL_Surface *img; // TODO: private
+        SDL_Texture *tx = nullptr;
+        SDL_Surface *surf = nullptr; // TODO: private
         uint32_t Get() const;
     };
 }

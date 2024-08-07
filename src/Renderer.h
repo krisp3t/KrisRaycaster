@@ -44,11 +44,11 @@ namespace KrisRaycaster
 
         bool ProcessInput();
 
-        Texture *CreateTexture(const std::string &filename, TextureFormat format);
+        size_t CreateTexture(const std::string &filename, TextureFormat format);
 
-        Texture *CreateTexture(TextureFormat format);
+        size_t CreateTexture(TextureFormat format);
 
-        bool InitMinimap(const Texture &floorTex, const std::vector<uint_fast8_t> &layout);
+        bool InitMinimap(const std::string &mapPath, const std::vector<uint_fast8_t> &layout);
 
 
     private:
@@ -82,5 +82,7 @@ namespace KrisRaycaster
         void DrawVLine(int x, int y, int height, uint32_t color);
 
         void DrawPlayerMinimap();
+
+        size_t CreateTexture(const std::string &filename, TextureFormat format, SDL_Renderer &rend);
     };
 }

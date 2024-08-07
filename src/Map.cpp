@@ -15,10 +15,7 @@ namespace KrisRaycaster
             std::cerr << "Failed to read map layout file: " << mapPath << std::endl;
         }
         rowLength = floor(sqrt(data.size()));
-        // TODO: don't hardcode
-        floorTexture = Renderer::Get().CreateTexture(mapPath + "/wall.png",
-                                                     TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888});
-        Renderer::Get().InitMinimap(*floorTexture, data);
+        Renderer::Get().InitMinimap(mapPath, data);
     }
 
     int Map::Get(size_t x, size_t y) const

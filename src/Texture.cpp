@@ -1,24 +1,24 @@
 #include <iostream>
 #include <cassert>
+#include "SDL2/SDL.h"
 #include "SDL2/SDL_surface.h"
 #include "SDL2/SDL_image.h"
 #include "Texture.h"
 
 namespace KrisRaycaster
 {
-    // TODO: don't hardcode target
     Texture::Texture(
             TextureFormat format
     ) : format(format)
     {
-        img = SDL_CreateRGBSurfaceWithFormat(
+        surf = SDL_CreateRGBSurfaceWithFormat(
                 0,
                 format.spriteW * format.rowCount,
 
                 format.spriteH * format.count / format.rowCount,
                 32,
                 format.format);
-        if (!img)
+        if (!surf)
         {
             std::cerr << "Failed to create texture : " << SDL_GetError() << std::endl;
             return;
@@ -30,17 +30,49 @@ namespace KrisRaycaster
             TextureFormat format
     ) : format(format)
     {
-        img = IMG_Load(filename.c_str());
-        if (!img)
+        surf = IMG_Load(filename.c_str());
+        if (!surf)
         {
             std::cerr << "Error in IMG_Load: " << IMG_GetError() << std::endl;
             return;
         }
     }
 
+    Texture::Texture(
+            const std::string &filename,
+            TextureFormat format,
+            SDL_Renderer &rend
+    ) : format(format)
+    {
+        tx = IMG_LoadTexture(&rend, filename.c_str());
+        if (!tx)
+        {
+            std::cerr << "Error in IMG_LoadTexture: " << IMG_GetError() << std::endl;
+            return;
+        }
+    }
+
+    Texture::Texture(
+            TextureFormat format,
+            SDL_Renderer &rend
+    ) : format(format)
+    {
+        tx = SDL_CreateTexture(
+                &rend,
+                format.format,
+                SDL_TEXTUREACCESS_STREAMING,
+                format.spriteW,
+                format.spriteH);
+        if (!tx)
+        {
+            std::cerr << "Failed to create texture : " << SDL_GetError() << std::endl;
+            return;
+        }
+    }
+
     Texture::~Texture()
     {
-        SDL_FreeSurface(img);
+        SDL_FreeSurface(surf);
     }
 
     SDL_Rect Texture::GetRect(int ix) const
