@@ -8,7 +8,6 @@
 #include "Math.h"
 #include "SDL_rect.h"
 
-
 namespace KrisRaycaster
 {
     class Texture;
@@ -26,13 +25,13 @@ namespace KrisRaycaster
 
         int GetSize() const;
 
-
         Vec2f playerPos = {2, 11};
         Vec2f dir = {0, -1};
         Vec2f cameraPlane = {0.66, 0}; // 2 * atan(0.66) = FOV 60
 
         size_t floorTexId;
         size_t ceilTexId;
+        size_t wallTexId;
         size_t minimapTexId;
 
         void MovePlayer(float step);
@@ -50,6 +49,5 @@ namespace KrisRaycaster
         std::vector<uint_fast8_t> data; // map data
 
         void Render();
-
     };
 }

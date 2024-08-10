@@ -5,13 +5,11 @@
 #include <vector>
 #include "Math.h"
 
-
 namespace KrisRaycaster
 {
     class Texture;
 
     struct TextureFormat;
-
 
     struct RendererSettings
     {
@@ -25,8 +23,6 @@ namespace KrisRaycaster
     class Renderer
     {
     public:
-
-
         ~Renderer();
 
         static Renderer &Get();
@@ -36,7 +32,6 @@ namespace KrisRaycaster
         Renderer &operator=(const Renderer &) = delete;
 
         int Init(SDL_Renderer *rend);
-
 
         void Render(double d);
 
@@ -49,7 +44,6 @@ namespace KrisRaycaster
         size_t CreateTexture(TextureFormat format);
 
         bool InitMinimap(const std::string &mapPath, const std::vector<uint_fast8_t> &layout);
-
 
     private:
         Renderer() = default;
@@ -71,15 +65,13 @@ namespace KrisRaycaster
         SDL_Rect leftRec;
         SDL_Rect rightRec;
 
-
         void CastRaysStep();
 
         void CastRaysDDA();
 
-
-        void DrawVLine(int x, int height, uint32_t color);
-
         void DrawVLine(int x, int y, int height, uint32_t color);
+        void DrawVLine(int x, int y, int height, int wallType, float collisionAt);
+
 
         void DrawPlayerMinimap();
 

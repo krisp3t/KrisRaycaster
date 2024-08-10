@@ -72,7 +72,8 @@ namespace KrisRaycaster
 
     Texture::~Texture()
     {
-        SDL_FreeSurface(surf);
+        //SDL_FreeSurface(surf);
+        // TODO: figure out when freed
     }
 
     SDL_Rect Texture::GetRect(int ix) const

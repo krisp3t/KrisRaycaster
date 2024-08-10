@@ -39,14 +39,19 @@ namespace KrisRaycaster
             std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
             return -1;
         }
+
+        // TODO: come up with better texture architecture
+        auto wallSurfId = CreateTexture("./map/minecraft/wall.png",
+            TextureFormat{ 32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888 });
+        Map* map = Game::Get().systems.map.get();
+        map->wallTexId = wallSurfId;
         return 0;
     }
 
     size_t Renderer::CreateTexture(
         TextureFormat format)
     {
-        auto t = Texture{format};
-        items.push_back(t);
+        items.push_back(Texture{ format });
         return items.size() - 1;
     }
 
@@ -54,8 +59,7 @@ namespace KrisRaycaster
         const std::string &filename,
         TextureFormat format)
     {
-        auto t = Texture{filename, format};
-        items.push_back(t);
+        items.push_back(Texture{ filename, format });
         return items.size() - 1;
     }
 
@@ -64,8 +68,7 @@ namespace KrisRaycaster
         TextureFormat format,
         SDL_Renderer &rend)
     {
-        auto t = Texture{filename, format, rend};
-        items.push_back(t);
+        items.push_back(Texture{ filename, format, rend });
         return items.size() - 1;
     }
 
@@ -73,6 +76,7 @@ namespace KrisRaycaster
     {
         const int tileBorder = 1;
         // TODO: free wallTex
+        // TODO: don't assume sprite size!
         auto wallTexId = CreateTexture(mapPath + "/wall.png",
                                        TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888}, *sdlRend);
         Texture *wallTex = &items[wallTexId];
@@ -275,11 +279,14 @@ namespace KrisRaycaster
             // rays.push_back({collisionPx.x, collisionPx.y});
             // SDL_Log("Collision: (%f, %f), col: %d, wall: %x, distance: %f", tile.x, tile.y,
             //         screenCol, wallType, distance);
+            float collisionAt = isHitVertical ? rayDir.x * distance : rayDir.y * distance;
+            collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
             // ceiling
             DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
-            DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, 0xFF0000FF);
-            // floor
+            DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt);
+            // DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, collisionAt);
+            //  floor
             DrawVLine(screenCol, settings.framebufferHeight / 2 + wallHeight / 2,
                       settings.framebufferHeight / 2 - wallHeight / 2,
                       0xFFFF0000);
@@ -298,6 +305,34 @@ namespace KrisRaycaster
         }
     }
 
+    void Renderer::DrawVLine(int x, int y, int height, int wallType, float collisionAt)
+    {
+        assert((y >= 0 && y < settings.framebufferHeight) || (height == 0));
+        assert(height >= 0 && height <= settings.framebufferHeight);
+        assert(x >= 0 && x < settings.framebufferWidth || (height == 0));
+        Map *map = Game::Get().systems.map.get();
+        Texture *wallSurf = &items[map->wallTexId];
+        int spriteW = wallSurf->format.spriteW;
+        int spriteH = wallSurf->format.spriteH;
+        int spriteRow = wallType / wallSurf->format.rowCount;
+    	int spriteCol = wallType % wallSurf->format.rowCount - 1;
+        int rowPixels = wallSurf->format.rowCount * spriteW;
+        Vec2 spriteStart = {
+        	spriteCol * spriteW + static_cast<int>(collisionAt * spriteW),
+        	spriteRow * rowPixels};
+        uint32_t *px = static_cast<uint32_t *>(wallSurf->surf->pixels); // TODO: separate function, boundary checks...
+        px += spriteStart.y * spriteW + spriteStart.x;
+        float texStep = static_cast<float>(spriteH) / static_cast<float>(height);
+        for (int i = 0; i < height; i++)
+        {
+            int iy = y + i;
+            // float brightness = 1.0f - fmin(1.0f, fmax(0.0f, collisonAt));
+            float brightness = 1.0f; // TODO: calculate depending on distance
+        	// uint32_t color = 0xFF000000 | static_cast<uint32_t>(brightness * 255) << 16;
+            framebuffer[iy * settings.framebufferWidth + x] = *(px + rowPixels * static_cast<int>(i * texStep));
+            // TODO: transpose framebuffer?
+        }
+    }
     void Renderer::BeforeFrame()
     {
         SDL_SetRenderTarget(sdlRend, nullptr);
