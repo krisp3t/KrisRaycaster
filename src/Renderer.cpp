@@ -279,17 +279,16 @@ namespace KrisRaycaster
             // rays.push_back({collisionPx.x, collisionPx.y});
             // SDL_Log("Collision: (%f, %f), col: %d, wall: %x, distance: %f", tile.x, tile.y,
             //         screenCol, wallType, distance);
-            float collisionAt = isHitVertical ? rayDir.x * distance : rayDir.y * distance;
+            float collisionAt = isHitVertical ? playerPos.x + rayDir.x * distance : playerPos.y + rayDir.y * distance;
             collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
             // ceiling
-            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
+            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF111111);
             // walls
             DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt);
             // DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, collisionAt);
             //  floor
             DrawVLine(screenCol, settings.framebufferHeight / 2 + wallHeight / 2,
-                      settings.framebufferHeight / 2 - wallHeight / 2,
-                      0xFFFF0000);
+                      settings.framebufferHeight / 2 - wallHeight / 2, 0xFF111111);
         }
     }
 
