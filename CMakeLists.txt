@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(KrisRaycaster)
 
-# set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TARGET_PLATFORM "DESKTOP" CACHE STRING "Target platform for build")
+set(TARGET_PLATFORM "DESKTOP" CACHE STRING "DESKTOP")
 set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS DESKTOP)
 
 # Common source files
@@ -29,7 +28,6 @@ file(GLOB SOURCES
         "${SRC_DIR}/*.h"
         "${SRC_DIR}/*.cpp"
 )
-add_subdirectory(debug/test_raycast)
 
 enable_cxx_compiler_flag_if_supported("-Wall")
 enable_cxx_compiler_flag_if_supported("-Wextra")
@@ -41,6 +39,7 @@ add_compile_definitions(_USE_MATH_DEFINES)
 if (TARGET_PLATFORM STREQUAL "DESKTOP")
     find_package(SDL2 REQUIRED)
     add_executable(${PROJECT_NAME} ${SOURCES})
+    add_executable(test_raycast src/debug/test_raycast/test_raycast.cpp)
     target_link_libraries(${PROJECT_NAME}
             PRIVATE
             $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>

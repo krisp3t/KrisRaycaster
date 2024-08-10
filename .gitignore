@@ -34,7 +34,10 @@
 # Cmake
 cmake-build-debug/
 out/
+build/
+vcpkg_installed
 
 # IDE
 .idea/
 .vs/
+.vscode/

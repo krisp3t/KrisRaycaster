@@ -1,5 +1,3 @@
-#include <iostream>
-#include <SDL.h>
 #include <SDL_ttf.h>
 #include <cassert>
 #include <sstream>
@@ -22,12 +20,11 @@ namespace KrisRaycaster
         sdlRend = rend;
         framebuffer = std::vector<uint32_t>(settings.framebufferWidth * settings.framebufferHeight, 0);
         framebufferTexture = SDL_CreateTexture(
-                sdlRend,
-                SDL_PIXELFORMAT_ABGR8888,
-                SDL_TEXTUREACCESS_STREAMING,
-                settings.framebufferWidth,
-                settings.framebufferHeight
-        );
+            sdlRend,
+            SDL_PIXELFORMAT_ABGR8888,
+            SDL_TEXTUREACCESS_STREAMING,
+            settings.framebufferWidth,
+            settings.framebufferHeight);
         if (!framebufferTexture)
         {
             std::cerr << "Failed to create framebuffer texture : " << SDL_GetError() << std::endl;
@@ -45,10 +42,8 @@ namespace KrisRaycaster
         return 0;
     }
 
-
     size_t Renderer::CreateTexture(
-            TextureFormat format
-    )
+        TextureFormat format)
     {
         auto t = Texture{format};
         items.push_back(t);
@@ -56,9 +51,8 @@ namespace KrisRaycaster
     }
 
     size_t Renderer::CreateTexture(
-            const std::string &filename,
-            TextureFormat format
-    )
+        const std::string &filename,
+        TextureFormat format)
     {
         auto t = Texture{filename, format};
         items.push_back(t);
@@ -66,10 +60,9 @@ namespace KrisRaycaster
     }
 
     size_t Renderer::CreateTexture(
-            const std::string &filename,
-            TextureFormat format,
-            SDL_Renderer &rend
-    )
+        const std::string &filename,
+        TextureFormat format,
+        SDL_Renderer &rend)
     {
         auto t = Texture{filename, format, rend};
         items.push_back(t);
@@ -81,22 +74,20 @@ namespace KrisRaycaster
         const int tileBorder = 1;
         // TODO: free wallTex
         auto wallTexId = CreateTexture(mapPath + "/wall.png",
-                                       TextureFormat
-                                               {32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888}, *sdlRend);
+                                       TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888}, *sdlRend);
         Texture *wallTex = &items[wallTexId];
         minimapTexture = SDL_CreateTexture(
-                sdlRend,
-                SDL_PIXELFORMAT_ABGR8888,
-                SDL_TEXTUREACCESS_TARGET,
-                settings.framebufferWidth,
-                settings.framebufferHeight
-        );
+            sdlRend,
+            SDL_PIXELFORMAT_ABGR8888,
+            SDL_TEXTUREACCESS_TARGET,
+            settings.framebufferWidth,
+            settings.framebufferHeight);
         SDL_SetRenderTarget(sdlRend, minimapTexture);
         int ix = 0;
         int mapSize = layout.size();
         int mapWidth = sqrt(mapSize);
         Vec2 tileSize{settings.framebufferWidth / mapWidth, settings.framebufferHeight / mapWidth};
-        for (uint_fast8_t tile: layout)
+        for (uint_fast8_t tile : layout)
         {
             SDL_Rect dest;
             dest.x = (ix % mapWidth) * tileSize.x;
@@ -107,7 +98,8 @@ namespace KrisRaycaster
             {
                 SDL_SetRenderDrawColor(sdlRend, 0xE5, 0xE5, 0xE5, 0xFF);
                 SDL_RenderFillRect(sdlRend, &dest);
-            } else
+            }
+            else
             {
                 dest.x += tileBorder;
                 dest.y += tileBorder;
@@ -123,7 +115,6 @@ namespace KrisRaycaster
         return true;
     }
 
-
     void Renderer::DrawPlayerMinimap()
     {
         constexpr int playerSize = 20;
@@ -132,22 +123,19 @@ namespace KrisRaycaster
         Map *map = Game::Get().systems.map.get();
         int mapSize = map->GetSize();
         Vec2f playerPos = {
-                map->playerPos.x * settings.framebufferWidth / mapSize,
-                map->playerPos.y * settings.framebufferHeight / mapSize
-        };
-
+            map->playerPos.x * settings.framebufferWidth / mapSize,
+            map->playerPos.y * settings.framebufferHeight / mapSize};
 
         // Draw player position (as a small circle or rectangle)
-        SDL_SetRenderDrawColor(sdlRend, 255, 0, 0, 255);  // Red color
+        SDL_SetRenderDrawColor(sdlRend, 255, 0, 0, 255); // Red color
         SDL_Rect playerRect = {
-                static_cast<int>(playerPos.x),
-                static_cast<int>(playerPos.y),
-                playerSize, playerSize
-        };
+            static_cast<int>(playerPos.x),
+            static_cast<int>(playerPos.y),
+            playerSize, playerSize};
         SDL_RenderFillRect(sdlRend, &playerRect);
 
         // Draw rays
-        SDL_SetRenderDrawColor(sdlRend, 0, 0, 255, 255);  // Blue color
+        SDL_SetRenderDrawColor(sdlRend, 0, 0, 255, 255); // Blue color
         SDL_RenderDrawLines(sdlRend, rays.data(), rays.size());
 
         Vec2f cameraRay = map->cameraPlane * 50.0f;
@@ -160,16 +148,14 @@ namespace KrisRaycaster
                            static_cast<int>(playerCentre.x),
                            static_cast<int>(playerCentre.y),
                            static_cast<int>(dirRay.x),
-                           static_cast<int>(dirRay.y)
-        );
+                           static_cast<int>(dirRay.y));
         // Draw camera plane
-        SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255);  // Green color
+        SDL_SetRenderDrawColor(sdlRend, 0, 255, 0, 255); // Green color
         SDL_RenderDrawLine(sdlRend,
                            static_cast<int>(dirRay.x - cameraRay.x),
                            static_cast<int>(dirRay.y - cameraRay.y),
                            static_cast<int>(dirRay.x + cameraRay.x),
-                           static_cast<int>(dirRay.y + cameraRay.y)
-        );
+                           static_cast<int>(dirRay.y + cameraRay.y));
     }
 
     // Basic (slow) implementation - just go along the rays with increments until you hit wall
@@ -245,12 +231,8 @@ namespace KrisRaycaster
             float mapX, mapY;
             int stepX = rayDir.x > 0 ? 1 : -1;
             int stepY = rayDir.y > 0 ? 1 : -1;
-            float xFactor = rayDir.x > 0 ?
-                            (ceil(start.x) - start.x) / rayDir.x :
-                            (floor(start.x) - start.x) / rayDir.x;
-            float yFactor = rayDir.y > 0 ?
-                            (ceil(start.y) - start.y) / rayDir.y :
-                            (floor(start.y) - start.y) / rayDir.y;
+            float xFactor = rayDir.x > 0 ? (ceil(start.x) - start.x) / rayDir.x : (floor(start.x) - start.x) / rayDir.x;
+            float yFactor = rayDir.y > 0 ? (ceil(start.y) - start.y) / rayDir.y : (floor(start.y) - start.y) / rayDir.y;
             bool hitXSide = false; // true if hitYSide
             // DDA only in one direction, if completely horizontal / vertical ray
             if (rayDir.x == 0)
@@ -270,7 +252,8 @@ namespace KrisRaycaster
                     mapY = playerPos.y + rayDir.y * xFactor;
                     xFactor += stepX / rayDir.x;
                     hitXSide = true;
-                } else
+                }
+                else
                 {
                     mapX = playerPos.x + rayDir.x * yFactor;
                     mapY = playerPos.y + rayDir.y * yFactor;
@@ -293,8 +276,8 @@ namespace KrisRaycaster
             rays.push_back({startPx.x, startPx.y});
             rays.push_back({collisionPx.x, collisionPx.y});
 
-//            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
-//                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
+            //            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
+            //                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
             // ceiling
             DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
@@ -328,7 +311,7 @@ namespace KrisRaycaster
 
     void Renderer::DrawFrame()
     {
-        //CastRaysStep();
+        // CastRaysStep();
         CastRaysDDA();
     }
 
@@ -348,7 +331,8 @@ namespace KrisRaycaster
         int fps = floor(1.0f / deltaTime);
         int time = floor(deltaTime * 1000);
         std::ostringstream stringStream;
-        stringStream << fps << " fps (" << time << " ms)" << "\n" << settings.framebufferWidth << "x"
+        stringStream << fps << " fps (" << time << " ms)" << "\n"
+                     << settings.framebufferWidth << "x"
                      << settings.framebufferHeight;
         std::string copyOfStr = stringStream.str();
         SDL_Surface *message = TTF_RenderText_Solid(font, copyOfStr.c_str(), {255, 255, 255});

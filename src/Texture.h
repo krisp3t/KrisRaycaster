@@ -11,9 +11,9 @@ namespace KrisRaycaster
     struct TextureFormat
     {
         int spriteW, spriteH; // sprite size
-        int count; // number of textures and size in pixels
-        int rowCount; // number of textures in a row
-        uint32_t format; // texture format // TODO: rewrite to use SDL_PixelFormatEnum
+        int count;            // number of textures and size in pixels
+        int rowCount;         // number of textures in a row
+        uint32_t format;      // texture format // TODO: rewrite to use SDL_PixelFormatEnum
         SDL_Rect rect;
     };
     struct ScreenPos
@@ -27,17 +27,14 @@ namespace KrisRaycaster
     {
     public:
         Texture(
-                const std::string &filename,
-                TextureFormat format
-        );
+            const std::string &filename,
+            TextureFormat format);
 
         Texture(TextureFormat format);
 
-        Texture::Texture(
-                TextureFormat format,
-                SDL_Renderer &rend
-        );
-
+        Texture(
+            TextureFormat format,
+            SDL_Renderer &rend);
 
         Texture(const std::string &filename, TextureFormat format, SDL_Renderer &rend);
 

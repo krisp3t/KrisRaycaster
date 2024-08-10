@@ -49,8 +49,7 @@ namespace KrisRaycaster
                 INIT_FRAMEBUFFER_HEIGHT,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE,
                 &window,
-                &sdlRend)
-                )
+                &sdlRend))
         {
             std::cerr << "Failed to create window and renderer: " << SDL_GetError() << std::endl;
             return -1;
