@@ -215,66 +215,62 @@ namespace KrisRaycaster
         rays.reserve(settings.framebufferWidth * 2);
         Map *map = Game::Get().systems.map.get();
         Vec2f playerPos = map->playerPos;
-        Vec2f dir = map->dir;
-        Vec2f cameraPlane = map->cameraPlane;
+        Vec2f dir = map->dir;                 // direction vector of player
+        Vec2f cameraPlane = map->cameraPlane; // perpendicular to dir, magnitude defines FOV
         int mapSize = Game::Get().systems.map->GetSize();
         for (int screenCol = 0; screenCol < settings.framebufferWidth; screenCol++)
         {
+            int wallType = 0;
             // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
             float cameraX = 2 * screenCol / static_cast<float>(settings.framebufferWidth) -
                             1; // screenCol in camera space [-1, 1]
             Vec2f rayDir = {dir.x + cameraPlane.x * cameraX,
                             dir.y + cameraPlane.y * cameraX};
-            Vec2f start = playerPos;
-
-            int wall = 0;
-            float mapX, mapY;
-            int stepX = rayDir.x > 0 ? 1 : -1;
-            int stepY = rayDir.y > 0 ? 1 : -1;
-            float xFactor = rayDir.x > 0 ? (ceil(start.x) - start.x) / rayDir.x : (floor(start.x) - start.x) / rayDir.x;
-            float yFactor = rayDir.y > 0 ? (ceil(start.y) - start.y) / rayDir.y : (floor(start.y) - start.y) / rayDir.y;
-            bool hitXSide = false; // true if hitYSide
-            // DDA only in one direction, if completely horizontal / vertical ray
-            if (rayDir.x == 0)
-            {
-                xFactor = 1e30; // will never be chosen
-            }
-            if (rayDir.y == 0)
-            {
-                yFactor = 1e30;
-            }
-            // TODO: prevent infinite loop?
+            Vec2 step = {
+                rayDir.x > 0 ? 1 : -1,
+                rayDir.y > 0 ? 1 : -1};
+            bool isHitVertical = false;
+            Vec2 tile = {
+                static_cast<int>(playerPos.x),
+                static_cast<int>(playerPos.y)};
+            // We have a direction of the ray for one screen column.
+            // 1. Figure out the scaling factor of rayDir so that x side == 1 / so that y side == 1.
+            Vec2f deltaFactor = {std::abs(1.0f / rayDir.x), std::abs(1.0f / rayDir.y)};
+            // 2. Figure out how much we need to travel to get to next x and y side.
+            Vec2f sideDist = {};
+            sideDist.x = rayDir.x > 0 ? (tile.x - playerPos.x + 1.0f) * deltaFactor.x : (playerPos.x - tile.x) * deltaFactor.x;
+            sideDist.y = rayDir.y > 0 ? (tile.y - playerPos.y + 1.0f) * deltaFactor.y : (playerPos.y - tile.y) * deltaFactor.y;
+            // 3. DDA - one step in x/y direction (whichever has shorter ray magnitude - scaling factor) until you hit a wall
+            Vec2f totalDist = sideDist;
             while (true)
             {
-                if (xFactor < yFactor)
+                assert(tile.x >= 0 && tile.x < mapSize && tile.y >= 0 && tile.y < mapSize && "Map layout must be closed off at edges!");
+                if (totalDist.x < totalDist.y)
                 {
-                    mapX = playerPos.x + rayDir.x * xFactor;
-                    mapY = playerPos.y + rayDir.y * xFactor;
-                    xFactor += stepX / rayDir.x;
-                    hitXSide = true;
+                    totalDist.x += deltaFactor.x;
+                    tile.x += step.x;
+                    isHitVertical = false;
                 }
                 else
                 {
-                    mapX = playerPos.x + rayDir.x * yFactor;
-                    mapY = playerPos.y + rayDir.y * yFactor;
-                    yFactor += stepY / rayDir.y;
-                    hitXSide = false;
+                    totalDist.y += deltaFactor.y;
+                    tile.y += step.y;
+                    isHitVertical = true;
                 }
-                wall = map->Get(static_cast<int>(mapX), static_cast<int>(mapY));
-                if (wall != 0)
+                wallType = map->Get(tile.x, tile.y);
+                if (wallType != 0)
                 {
                     break;
                 }
             }
-            Vec2f collision = {mapX, mapY};
-            Vec2 startPx = MapToScreen(start, Vec2{settings.framebufferWidth, settings.framebufferHeight}, mapSize);
-            Vec2 collisionPx = MapToScreen(collision,
-                                           Vec2{settings.framebufferWidth, settings.framebufferHeight},
-                                           mapSize);
-            float distance = (collision - start).Length();
+            // Vec2 startPx = MapToScreen(playerPos, Vec2{settings.framebufferWidth, settings.framebufferHeight}, mapSize);
+            // Vec2 collisionPx = MapToScreen(map,
+            //                                Vec2{settings.framebufferWidth, settings.framebufferHeight},
+            //                                mapSize);
+            float distance = isHitVertical ? totalDist.y - deltaFactor.y : totalDist.x - deltaFactor.x;
             int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
-            rays.push_back({startPx.x, startPx.y});
-            rays.push_back({collisionPx.x, collisionPx.y});
+            // rays.push_back({startPx.x, startPx.y});
+            // rays.push_back({collisionPx.x, collisionPx.y});
 
             //            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
             //                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);

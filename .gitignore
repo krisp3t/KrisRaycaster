@@ -32,8 +32,8 @@
 *.app
 
 # Debug files
-.ilk
-.pdb
+*.ilk
+*.pdb
 
 # Cmake
 cmake-build-debug/
