@@ -263,17 +263,18 @@ namespace KrisRaycaster
                     break;
                 }
             }
+            // 4. When collision found, calculate distance to wall.
+            // Subtract one tile, because collision actually happens at edge of wall (position + size of tile).
+            float distance = isHitVertical ? totalDist.y - deltaFactor.y : totalDist.x - deltaFactor.x;
+            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
             // Vec2 startPx = MapToScreen(playerPos, Vec2{settings.framebufferWidth, settings.framebufferHeight}, mapSize);
             // Vec2 collisionPx = MapToScreen(map,
             //                                Vec2{settings.framebufferWidth, settings.framebufferHeight},
-            //                                mapSize);
-            float distance = isHitVertical ? totalDist.y - deltaFactor.y : totalDist.x - deltaFactor.x;
-            int wallHeight = floor(settings.framebufferHeight / fmax(distance, 1.0));
+            //                                mapSize);p
             // rays.push_back({startPx.x, startPx.y});
             // rays.push_back({collisionPx.x, collisionPx.y});
-
-            //            SDL_Log("Collision: (%f, %f), col: %d, wall: %x, factor: %f, distance: %f", collision.x, collision.y,
-            //                    screenCol, wall, hitXSide ? xFactor : yFactor, distance);
+            // SDL_Log("Collision: (%f, %f), col: %d, wall: %x, distance: %f", tile.x, tile.y,
+            //         screenCol, wallType, distance);
             // ceiling
             DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF00FF00);
             // walls
