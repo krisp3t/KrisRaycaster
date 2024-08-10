@@ -9,7 +9,6 @@ namespace KrisRaycaster
         return instance;
     }
 
-
     void Game::ProcessInput(double deltaTime)
     {
         SDL_Event event;
@@ -41,7 +40,6 @@ namespace KrisRaycaster
 
     void Game::Update(double deltaTime)
     {
-
     }
 
     void Game::Render(double deltaTime)
@@ -59,7 +57,4 @@ namespace KrisRaycaster
         systems.map = std::make_unique<Map>("./map/minecraft");
     }
 
-
 }
-
-

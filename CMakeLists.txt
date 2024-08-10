@@ -37,9 +37,12 @@ enable_cxx_compiler_flag_if_supported("-O3")
 add_compile_definitions(_USE_MATH_DEFINES)
 
 if (TARGET_PLATFORM STREQUAL "DESKTOP")
-    find_package(SDL2 REQUIRED)
     add_executable(${PROJECT_NAME} ${SOURCES})
     add_executable(test_raycast src/debug/test_raycast/test_raycast.cpp)
+    set_target_properties(${PROJECT_NAME}
+    PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR})
+    find_package(SDL2 REQUIRED)
     target_link_libraries(${PROJECT_NAME}
             PRIVATE
             $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
