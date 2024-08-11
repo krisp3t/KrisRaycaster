@@ -285,24 +285,63 @@ namespace KrisRaycaster
             collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
             // brightness at distance 1 max, across whole map almost 0
             float brightness = pow(((mapSize + 1) - distance) / mapSize, 2);
+
             // ceiling
-            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFFFF1111);
+            DrawVLine(screenCol, 0, settings.framebufferHeight / 2,  0x9C8255, 0xFF3E1016);
+            // floor
+            DrawVLine(screenCol, settings.framebufferHeight / 2,
+                settings.framebufferHeight / 2, 0xFF000000, 0xFF110E1A);
             // walls
             DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt, brightness);
-            // DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, collisionAt);
-            //  floor
-            DrawVLine(screenCol, settings.framebufferHeight / 2 + wallHeight / 2,
-                      settings.framebufferHeight / 2 - wallHeight / 2, 0xFF111111);
+
         }
     }
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
-        assert((y >= 0 && y < settings.framebufferHeight) || (height == 0));
-        assert(height >= 0 && height <= settings.framebufferHeight);
-        assert(x >= 0 && x < settings.framebufferWidth || (height == 0));
+        if (height <= 0) {
+            return;
+        }
+        assert((y >= 0 && y < settings.framebufferHeight));
+        assert(height <= settings.framebufferHeight);
+        assert(x >= 0 && x < settings.framebufferWidth);
         for (int i = 0; i < height; i++)
         {
+            int iy = y + i;
+            framebuffer[iy * settings.framebufferWidth + x] = color;
+        }
+    }
+
+    void Renderer::DrawVLine(int x, int y, int height, uint32_t fromColor, uint32_t toColor)
+    {
+        if (height <= 0) {
+            return;
+        }
+        assert((y >= 0 && y < settings.framebufferHeight));
+        assert(height <= settings.framebufferHeight);
+        assert(x >= 0 && x < settings.framebufferWidth);
+
+        uint8_t fromA = (fromColor >> 24) & 0xFF;
+        uint8_t fromB = (fromColor >> 16) & 0xFF;
+        uint8_t fromG = (fromColor >> 8) & 0xFF;
+        uint8_t fromR = fromColor & 0xFF;
+
+        uint8_t toA = (toColor >> 24) & 0xFF;
+        uint8_t toB = (toColor >> 16) & 0xFF;
+        uint8_t toG = (toColor >> 8) & 0xFF;
+        uint8_t toR = toColor & 0xFF;
+
+        for (int i = 0; i < height; i++) {
+            float t = static_cast<float>(i) / (height - 1);
+
+            // Linear interpolation
+            uint8_t a = static_cast<uint8_t>((1.0f - t) * fromA + t * toA);
+            uint8_t b = static_cast<uint8_t>((1.0f - t) * fromB + t * toB);
+            uint8_t g = static_cast<uint8_t>((1.0f - t) * fromG + t * toG);
+            uint8_t r = static_cast<uint8_t>((1.0f - t) * fromR + t * toR);
+
+            uint32_t color = (a << 24) | (b << 16) | (g << 8) | r;
+
             int iy = y + i;
             framebuffer[iy * settings.framebufferWidth + x] = color;
         }
