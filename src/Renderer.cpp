@@ -2,6 +2,8 @@
 #include <cassert>
 #include <sstream>
 #include "Renderer.h"
+
+#include "Math.h"
 #include "Map.h"
 #include "Texture.h"
 #include "Game.h"
@@ -281,10 +283,12 @@ namespace KrisRaycaster
             //         screenCol, wallType, distance);
             float collisionAt = isHitVertical ? playerPos.x + rayDir.x * distance : playerPos.y + rayDir.y * distance;
             collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
+            // brightness at distance 1 max, across whole map almost 0
+            float brightness = pow(((mapSize + 1) - distance) / mapSize, 2);
             // ceiling
-            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFF111111);
+            DrawVLine(screenCol, 0, settings.framebufferHeight / 2 - wallHeight / 2, 0xFFFF1111);
             // walls
-            DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt);
+            DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt, brightness);
             // DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, collisionAt);
             //  floor
             DrawVLine(screenCol, settings.framebufferHeight / 2 + wallHeight / 2,
@@ -304,7 +308,8 @@ namespace KrisRaycaster
         }
     }
 
-    void Renderer::DrawVLine(int x, int y, int height, int wallType, float collisionAt)
+
+    void Renderer::DrawVLine(int x, int y, int height, int wallType, float collisionAt, float brightness)
     {
         assert((y >= 0 && y < settings.framebufferHeight) || (height == 0));
         assert(height >= 0 && height <= settings.framebufferHeight);
@@ -325,10 +330,8 @@ namespace KrisRaycaster
         for (int i = 0; i < height; i++)
         {
             int iy = y + i;
-            // float brightness = 1.0f - fmin(1.0f, fmax(0.0f, collisonAt));
-            float brightness = 1.0f; // TODO: calculate depending on distance
-        	// uint32_t color = 0xFF000000 | static_cast<uint32_t>(brightness * 255) << 16;
-            framebuffer[iy * settings.framebufferWidth + x] = *(px + rowPixels * static_cast<int>(i * texStep));
+            uint32_t texColor = *(px + rowPixels * static_cast<int>(i * texStep));
+            framebuffer[iy * settings.framebufferWidth + x] = ApplyBrightnessAbgr(texColor, brightness);
             // TODO: transpose framebuffer?
         }
     }

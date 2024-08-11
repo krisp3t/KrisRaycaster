@@ -70,7 +70,7 @@ namespace KrisRaycaster
         void CastRaysDDA();
 
         void DrawVLine(int x, int y, int height, uint32_t color);
-        void DrawVLine(int x, int y, int height, int wallType, float collisionAt);
+        void DrawVLine(int x, int y, int height, int wallType, float collisionAt, float brightness);
 
 
         void DrawPlayerMinimap();
