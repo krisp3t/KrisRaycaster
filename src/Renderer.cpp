@@ -314,6 +314,7 @@ namespace KrisRaycaster
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t fromColor, uint32_t toColor)
     {
+        constexpr short stepSize = 4;
         if (height <= 0) {
             return;
         }
@@ -331,19 +332,23 @@ namespace KrisRaycaster
         uint8_t toG = (toColor >> 8) & 0xFF;
         uint8_t toR = toColor & 0xFF;
 
+        uint32_t currentColor = fromColor;
+
         for (int i = 0; i < height; i++) {
-            float t = static_cast<float>(i) / (height - 1);
+            if (i % stepSize == 0) {
+                const float t = static_cast<float>(i) / (height - 1);
 
-            // Linear interpolation
-            uint8_t a = static_cast<uint8_t>((1.0f - t) * fromA + t * toA);
-            uint8_t b = static_cast<uint8_t>((1.0f - t) * fromB + t * toB);
-            uint8_t g = static_cast<uint8_t>((1.0f - t) * fromG + t * toG);
-            uint8_t r = static_cast<uint8_t>((1.0f - t) * fromR + t * toR);
+                // Linear interpolation
+                uint8_t a = static_cast<uint8_t>((1.0f - t) * fromA + t * toA);
+                uint8_t b = static_cast<uint8_t>((1.0f - t) * fromB + t * toB);
+                uint8_t g = static_cast<uint8_t>((1.0f - t) * fromG + t * toG);
+                uint8_t r = static_cast<uint8_t>((1.0f - t) * fromR + t * toR);
 
-            uint32_t color = (a << 24) | (b << 16) | (g << 8) | r;
+                currentColor = (a << 24) | (b << 16) | (g << 8) | r;
 
+            }
             int iy = y + i;
-            framebuffer[iy * settings.framebufferWidth + x] = color;
+            framebuffer[iy * settings.framebufferWidth + x] = currentColor;
         }
     }
 
