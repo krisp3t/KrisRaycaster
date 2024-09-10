@@ -1,12 +1,9 @@
 #include <cstdio>
+#include <cmath>
 #include <gui/gamescreen_screen/GameScreenView.hpp>
 #include <gui/common/globals.hpp>
 #include <gui/raycaster/Raycaster.hpp>
 #include <touchgfx/Utils.hpp>
-
-#ifdef SIMULATOR
-#include <ctime>
-#endif
 
 char debugStringBuffer[30];
 
@@ -50,11 +47,9 @@ void GameScreenView::handleTickEvent()
 	Raycaster::render(fb);
 	image.invalidate();
 
-    // get timer
-    static int count = 0;
-    count++;
-    HAL_GetTick();
-    snprintf(debugStringBuffer, sizeof(debugStringBuffer), "%d fps (ms)", clock());
+    short fps = 60 / HAL::getInstance()->getLCDRefreshCount();
+    short ms = static_cast<short>(round((1000.0f / fps)));
+    snprintf(debugStringBuffer, sizeof(debugStringBuffer), "%d fps (%d ms)", fps, ms);
     Application::getDebugPrinter()->setString(debugStringBuffer);
     Application::invalidateDebugRegion();
 }
