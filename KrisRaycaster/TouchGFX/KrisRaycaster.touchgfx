@@ -5,23 +5,6 @@
         "Name": "GameScreen",
         "Components": [],
         "Interactions": []
-      },
-      {
-        "Name": "Screen1",
-        "Components": [
-          {
-            "Type": "Box",
-            "Name": "box1",
-            "Width": 272,
-            "Height": 163,
-            "Color": {
-              "Red": 157,
-              "Green": 6,
-              "Blue": 212
-            }
-          }
-        ],
-        "Interactions": []
       }
     ],
     "CustomContainerDefinitions": [],

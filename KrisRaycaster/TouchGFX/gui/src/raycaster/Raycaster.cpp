@@ -14,9 +14,10 @@ void Raycaster::render(uint8_t *framebuffer)
 {
     auto fb = reinterpret_cast<uint16_t *>(framebuffer);
     // ceiling
-    drawHLines(fb, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0xf800);
+    drawHLines(fb, 0, 0, KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT / 2, 0xf800, 0xf7e0);
     // floor
-    drawHLines(fb, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0x07e0);
+    drawHLines(fb, 0, KrisRaycaster::SCREEN_HEIGHT / 2, KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT / 2, 0x102c, 0x0841);
+
     Vec2f playerPos = Raycaster::playerPos;
     Vec2f dir = Raycaster::dir;                 // direction vector of player
     Vec2f cameraPlane = Raycaster::cameraPlane; // perpendicular to dir, magnitude defines FOV
@@ -89,6 +90,33 @@ void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width,
     for (uint16_t i = 0; i < height; i++) {
         for (uint16_t j = 0; j < width; j++) {
 			fb[SCREEN_WIDTH * (y + i) + x + j] = color;
+		}
+	}
+}
+
+void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t fromColor, uint16_t toColor)
+{
+	assert(x < SCREEN_WIDTH && y < SCREEN_HEIGHT && "Invalid coordinates");
+	assert(width <= SCREEN_WIDTH && width > 0 && "Invalid width");
+	assert(height <= SCREEN_HEIGHT && height > 0 && "Invalid height");
+
+    // Assuming RGB565 format
+    uint8_t fromR = (fromColor >> 11) & 0x1F; 
+    uint8_t fromG = (fromColor >> 5) & 0x3F;
+    uint8_t fromB = fromColor & 0x1F;
+
+    uint8_t toR = (toColor >> 11) & 0x1F;
+    uint8_t toG = (toColor >> 5) & 0x3F;
+    uint8_t toB = toColor & 0x1F;
+  
+	for (uint16_t i = 0; i < height; i++) {
+        float t = static_cast<float>(i) / (height - 1);
+        uint8_t r = static_cast<int>(fromR + t * (toR - fromR));
+        uint8_t g = static_cast<int>(fromG + t * (toG - fromG));
+        uint8_t b = static_cast<int>(fromB + t * (toB - fromB));
+        uint16_t interpolatedColor = (r << 11) | (g << 5) | b;
+		for (uint16_t j = 0; j < width; j++) {
+            fb[SCREEN_WIDTH * (y + i) + x + j] = interpolatedColor;
 		}
 	}
 }

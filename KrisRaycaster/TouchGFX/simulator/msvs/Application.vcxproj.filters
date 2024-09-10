@@ -190,18 +190,6 @@
     <Filter Include="Source Files\gui\raycaster">
       <UniqueIdentifier>05FBC5E2-0E3F-1A23-A2FA-742F5E51B5A1</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gui\screen1_screen">
-      <UniqueIdentifier>E0ABB409-A9A7-D73A-0D92-99041193DCF2</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\gui\screen1_screen">
-      <UniqueIdentifier>44B23CB1-DC1B-DA06-7CB7-4EEC5CF7C48F</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\generated\gui_generated\screen1_screen">
-      <UniqueIdentifier>B21E80FD-F070-7D02-2605-AE0FEFAB0423</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\generated\gui_generated\screen1_screen">
-      <UniqueIdentifier>E59BC6B5-7170-BCB8-471F-E6C336A3FDD4</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(TouchGFXReleasePath)\framework\source\platform\driver\touch\SDL2TouchController.cpp">
@@ -245,15 +233,6 @@
     </ClCompile>
     <ClCompile Include="..\..\gui\src\raycaster\Raycaster.cpp">
       <Filter>Source Files\gui\raycaster</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\screen1_screen\Screen1Presenter.cpp">
-      <Filter>Source Files\gui\screen1_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\screen1_screen\Screen1View.cpp">
-      <Filter>Source Files\gui\screen1_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen1_screen\Screen1ViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\screen1_screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -712,14 +691,8 @@
     <ClInclude Include="..\..\gui\include\gui\raycaster\Raycaster.hpp">
       <Filter>Header Files\gui\raycaster</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screen1_screen\Screen1Presenter.hpp">
-      <Filter>Header Files\gui\screen1_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\screen1_screen\Screen1View.hpp">
-      <Filter>Header Files\gui\screen1_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen1_screen\Screen1ViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\screen1_screen</Filter>
+    <ClInclude Include="..\..\gui\include\gui\raycaster\Math.hpp">
+      <Filter>Header Files\gui\raycaster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

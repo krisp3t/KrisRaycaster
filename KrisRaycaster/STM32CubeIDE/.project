@@ -620,16 +620,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/gui/src/raycaster/Raycaster.cpp</locationURI>
 		</link>
 		<link>
-			<name>Application/User/gui/Screen1Presenter.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/gui/src/screen1_screen/Screen1Presenter.cpp</locationURI>
-		</link>
-		<link>
-			<name>Application/User/gui/Screen1View.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/gui/src/screen1_screen/Screen1View.cpp</locationURI>
-		</link>
-		<link>
 			<name>Application/User/generated/ApplicationFontProvider.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/fonts/src/ApplicationFontProvider.cpp</locationURI>
@@ -715,11 +705,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/gui_generated/src/gamescreen_screen/GameScreenViewBase.cpp</locationURI>
 		</link>
 		<link>
-			<name>Application/User/generated/Screen1ViewBase.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/gui_generated/src/screen1_screen/Screen1ViewBase.cpp</locationURI>
-		</link>
-		<link>
 			<name>Application/User/generated/BitmapDatabase.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/images/src/BitmapDatabase.cpp</locationURI>
@@ -728,6 +713,11 @@
 			<name>Application/User/generated/SVGDatabase.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/images/src/SVGDatabase.cpp</locationURI>
+		</link>
+		<link>
+			<name>Application/User/generated/image_wall.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/TouchGFX/generated/images/src/image_wall.cpp</locationURI>
 		</link>
 		<link>
 			<name>Application/User/generated/LanguageGb.cpp</name>

@@ -38,6 +38,8 @@ void GameScreenView::tearDownScreen()
 void GameScreenView::handleTickEvent()
 {
 	uint8_t *fb = Bitmap::dynamicBitmapGetAddress(bmpId);
+    Raycaster::playerPos.x += 0.01f;
+    Raycaster::playerPos.y -= 0.01f;
 	Raycaster::render(fb);
 	image.invalidate();
 }
