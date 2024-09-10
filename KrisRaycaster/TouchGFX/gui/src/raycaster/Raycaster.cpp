@@ -2,13 +2,59 @@
 #include <cmath>
 #include <gui/raycaster/Raycaster.hpp>
 #include <gui/common/globals.hpp>
-#include "touchgfx/Utils.hpp"
+#include <gui/raycaster/Picture.hpp>
+#include <touchgfx/Utils.hpp>
 
 Vec2f Raycaster::playerPos = {2, 11};
 Vec2f Raycaster::dir = {0, -1};
 Vec2f Raycaster::cameraPlane = {0.66f, 0};
 
 using namespace KrisRaycaster;
+
+touchgfx::Rect Raycaster::getMapRect(uint8_t cellType)
+{
+    assert(cellType <= (TEXTURE_ATLAS_SIDE * TEXTURE_ATLAS_SIDE) / (TEXTURE_SIDE * TEXTURE_SIDE) && "Invalid cell type");
+    if (cellType == 0)
+	{
+        cellType = EMPTY_TEXTURE;
+	}
+    int16_t rectX = ((cellType - 1) % TEXTURE_STRIDE) * TEXTURE_SIDE;
+    int16_t rectY = ((cellType - 1) / TEXTURE_STRIDE) * TEXTURE_SIDE;
+    return touchgfx::Rect{
+		rectX,
+		rectY,
+		TEXTURE_SIDE,
+		TEXTURE_SIDE};
+}
+
+
+void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 destSize)
+{
+    int16_t destX = 0;
+    int16_t destY = 0;
+    int16_t scaleX = destSize.x / MAP_SIDE;
+    int16_t scaleY = destSize.y / MAP_SIDE;
+    short counter = 0;
+    for (const auto& cell : MAP)
+    {
+        Picture::copySrcDestRect(
+			src,
+			dest,
+			srcSize,
+			destSize,
+			getMapRect(cell),
+			touchgfx::Rect{destX, destY, scaleX, scaleY}
+		);
+        destX += scaleX;
+        counter++;
+        if (counter == MAP_SIDE)
+        {
+            counter = 0;
+            destY += scaleY;
+            destX = 0;
+        }
+    }
+}
 
 void Raycaster::render(uint8_t *framebuffer)
 {

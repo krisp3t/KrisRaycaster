@@ -5,8 +5,6 @@
 
 namespace KrisRaycaster
 {
-    // Portrait mode because we draw vertical lines in raycasting
-    // Writing to framebuffer rows is faster than writing to columns
     constexpr uint_fast16_t SCREEN_WIDTH = 480 / 2; // one half of the screen (map uses half, game uses half)
     constexpr uint_fast16_t SCREEN_HEIGHT = 272;
 	constexpr uint8_t MAP_SIDE = 16;
@@ -28,5 +26,9 @@ namespace KrisRaycaster
 		0x03,0x34,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x24,
 		0x15,0x15,0x15,0x75,0x15,0x15,0x15,0x15,0x75,0x75,0x75,0x15,0x15,0x15,0x75,0x75,
     };
+	constexpr uint_fast16_t TEXTURE_ATLAS_SIDE = 512;
+	constexpr uint8_t TEXTURE_SIDE = 32; // 32x32 textures
+	constexpr uint8_t TEXTURE_STRIDE = TEXTURE_ATLAS_SIDE / TEXTURE_SIDE; // 512/32=16 in one row
+	constexpr uint8_t EMPTY_TEXTURE = 127; // cell type of empty floor
 }
 #endif

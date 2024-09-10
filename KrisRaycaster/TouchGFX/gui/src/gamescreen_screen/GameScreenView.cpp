@@ -6,6 +6,8 @@
 #include <images/BitmapDatabase.hpp>
 #include <touchgfx/Utils.hpp>
 
+#include "gui/raycaster/Picture.hpp"
+
 char debugStringBuffer[30];
 
 GameScreenView::GameScreenView()
@@ -31,13 +33,7 @@ void GameScreenView::setupScreen()
     );
     // Map image setup
     Bitmap mapSource(BITMAP_WALL_ID);
-    uint16_t sourceWidth = mapSource.getWidth();
-    uint16_t sourceHeight = mapSource.getHeight();
     const uint16_t* sourceData = (const uint16_t*)mapSource.getData();
-
-
-    uint16_t destWidth = KrisRaycaster::SCREEN_WIDTH;
-    uint16_t destHeight = KrisRaycaster::SCREEN_HEIGHT;
     uint16_t* destData = (uint16_t*)Bitmap::dynamicBitmapGetAddress(mapBmpId);
     if (!(sourceData && destData))
     {
@@ -45,22 +41,12 @@ void GameScreenView::setupScreen()
 	}
 	else
 	{
-        touchgfx_printf("Source map dimensions: %d x %d\n", sourceWidth, sourceHeight);
-        touchgfx_printf("Destination map dimensions: %d x %d\n", destWidth, destHeight);
-        touchgfx_printf("Source map data at 0x%p\n", sourceData);
-        touchgfx_printf("Desination map data at 0x%p\n", destData);
-        for (uint16_t y = 0; y < destHeight; y++)
-        {
-            for (uint16_t x = 0; x < destWidth; x++)
-            {
-                float scaleX = static_cast<float>(sourceWidth) / destWidth;
-                float scaleY = static_cast<float>(sourceHeight) / destHeight;
-                uint16_t srcX = static_cast<uint16_t>(x * scaleX);
-                uint16_t srcY = static_cast<uint16_t>(y * scaleY);
-
-                destData[y * destWidth + x] = sourceData[srcY * sourceWidth + srcX];
-            }
-        }
+        Raycaster::initMap(
+            sourceData, 
+            destData, 
+            Vec2{ mapSource.getWidth(), mapSource.getHeight()}, 
+            Vec2{KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT}
+        );
     }
     mapImg.setBitmap(Bitmap(mapBmpId));
     mapImg.setXY(0, 0);

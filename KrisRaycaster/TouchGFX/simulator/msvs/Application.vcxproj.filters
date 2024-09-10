@@ -234,6 +234,9 @@
     <ClCompile Include="..\..\gui\src\raycaster\Raycaster.cpp">
       <Filter>Source Files\gui\raycaster</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\gui\src\raycaster\Picture.cpp">
+      <Filter>Source Files\gui\raycaster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml">
@@ -692,6 +695,9 @@
       <Filter>Header Files\gui\raycaster</Filter>
     </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\raycaster\Math.hpp">
+      <Filter>Header Files\gui\raycaster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\raycaster\Picture.hpp">
       <Filter>Header Files\gui\raycaster</Filter>
     </ClInclude>
   </ItemGroup>
