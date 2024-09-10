@@ -3,6 +3,7 @@
 
 #include <gui_generated/gamescreen_screen/GameScreenViewBase.hpp>
 #include <gui/gamescreen_screen/GameScreenPresenter.hpp>
+#include <touchgfx/widgets/Image.hpp>
 
 class GameScreenView : public GameScreenViewBase
 {
@@ -11,7 +12,10 @@ public:
     virtual ~GameScreenView() {}
     virtual void setupScreen();
     virtual void tearDownScreen();
-protected:
+    virtual void handleTickEvent();
+private:
+	touchgfx::BitmapId bmpId;
+    touchgfx::Image image;
 };
 
 #endif // GAMESCREENVIEW_HPP

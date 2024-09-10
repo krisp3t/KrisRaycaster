@@ -184,6 +184,12 @@
     <Filter Include="Header Files\generated\simulator\include\simulator\video">
       <UniqueIdentifier>85B5A702-3FBA-C50E-6B9A-8C7790DF3CEC</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gui\raycaster">
+      <UniqueIdentifier>82D184FB-BEFA-B151-D8E9-2926FBB2B266</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\raycaster">
+      <UniqueIdentifier>05FBC5E2-0E3F-1A23-A2FA-742F5E51B5A1</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(TouchGFXReleasePath)\framework\source\platform\driver\touch\SDL2TouchController.cpp">
@@ -224,6 +230,9 @@
     </ClCompile>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp">
       <Filter>Source Files\generated\simulator\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\raycaster\Raycaster.cpp">
+      <Filter>Source Files\gui\raycaster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -675,6 +684,12 @@
     </ClInclude>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp">
       <Filter>Header Files\generated\simulator\include\simulator\video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\common\globals.hpp">
+      <Filter>Header Files\gui\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\raycaster\Raycaster.hpp">
+      <Filter>Header Files\gui\raycaster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
