@@ -5,6 +5,23 @@
         "Name": "GameScreen",
         "Components": [],
         "Interactions": []
+      },
+      {
+        "Name": "Screen1",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "box1",
+            "Width": 272,
+            "Height": 163,
+            "Color": {
+              "Red": 157,
+              "Green": 6,
+              "Blue": 212
+            }
+          }
+        ],
+        "Interactions": []
       }
     ],
     "CustomContainerDefinitions": [],
@@ -38,25 +55,7 @@
     "FrameworkFeatures": {
       "LCD16bpp": {
         "Id": "LCD16bpp",
-        "Features": [
-          {
-            "Id": "TextureMapperImageFormats",
-            "Features": [
-              {
-                "Id": "RGB565",
-                "IsEnabled": true
-              }
-            ]
-          },
-          {
-            "Id": "L8Compression",
-            "IsEnabled": true
-          },
-          {
-            "Id": "RGBCompression",
-            "IsEnabled": true
-          }
-        ]
+        "IsEnabled": true
       }
     },
     "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
@@ -70,7 +69,7 @@
     "LandscapeSkinY": 0,
     "PortraitSkinX": 0,
     "PortraitSkinY": 0,
-    "DisplayOrientation": "Portrait",
+    "DisplayOrientation": "Landscape",
     "Family": "STM32H7",
     "SubFamily": "STM32H750 Value line",
     "Toolchain": "STM32CubeIDE",

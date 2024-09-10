@@ -1,7 +1,8 @@
+#include <cstdlib>
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/common/globals.hpp>
-
 #include "touchgfx/Utils.hpp"
+
 
 FrontendApplication::FrontendApplication(Model& m, FrontendHeap& heap)
     : FrontendApplicationBase(m, heap)
