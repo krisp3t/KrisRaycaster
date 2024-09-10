@@ -7,7 +7,7 @@ namespace KrisRaycaster
 {
     // Portrait mode because we draw vertical lines in raycasting
     // Writing to framebuffer rows is faster than writing to columns
-    constexpr uint_fast16_t SCREEN_WIDTH = 480;
+    constexpr uint_fast16_t SCREEN_WIDTH = 480 / 2; // one half of the screen (map uses half, game uses half)
     constexpr uint_fast16_t SCREEN_HEIGHT = 272;
 	constexpr uint8_t MAP_SIDE = 16;
     constexpr uint8_t MAP[] = {

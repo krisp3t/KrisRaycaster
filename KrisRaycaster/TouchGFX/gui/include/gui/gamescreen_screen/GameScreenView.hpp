@@ -14,8 +14,11 @@ public:
     virtual void tearDownScreen();
     virtual void handleTickEvent();
 private:
-	touchgfx::BitmapId bmpId;
-    touchgfx::Image image;
+    touchgfx::BitmapId mapBmpId;
+    touchgfx::Image mapImg;
+
+	touchgfx::BitmapId gameBmpId;
+    touchgfx::Image gameImg;
 };
 
 #endif // GAMESCREENVIEW_HPP
