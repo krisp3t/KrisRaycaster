@@ -1,0 +1,26 @@
+# TouchGFX generates those at project creation
+Core/
+Drivers/
+EWARM/
+ExtMem_Boot/
+gcc/
+LIBJPEG/
+MDK-ARM/
+Middlewares/
+Utilities/
+
+KrisRaycaster/TouchGFX/App/
+KrisRaycaster/TouchGFX/target/
+KrisRaycaster/TouchGFX/build/
+KrisRaycaster/TouchGFX/generated/
+KrisRaycaster/TouchGFX/simulator/msvs/.vs/
+
+# Build files
+*.bin
+*.elf
+*.hex
+*.d
+*.o
+*.dll
+*.exe
+*.cache
