@@ -1,7 +1,14 @@
+#include <cstdio>
 #include <gui/gamescreen_screen/GameScreenView.hpp>
 #include <gui/common/globals.hpp>
 #include <gui/raycaster/Raycaster.hpp>
-#include "touchgfx/Utils.hpp"
+#include <touchgfx/Utils.hpp>
+
+#ifdef SIMULATOR
+#include <ctime>
+#endif
+
+char debugStringBuffer[30];
 
 GameScreenView::GameScreenView()
 {
@@ -42,4 +49,12 @@ void GameScreenView::handleTickEvent()
     Raycaster::playerPos.y -= 0.01f;
 	Raycaster::render(fb);
 	image.invalidate();
+
+    // get timer
+    static int count = 0;
+    count++;
+    HAL_GetTick();
+    snprintf(debugStringBuffer, sizeof(debugStringBuffer), "%d fps (ms)", clock());
+    Application::getDebugPrinter()->setString(debugStringBuffer);
+    Application::invalidateDebugRegion();
 }
