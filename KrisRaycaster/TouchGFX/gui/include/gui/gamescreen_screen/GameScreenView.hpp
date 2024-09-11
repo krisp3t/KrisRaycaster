@@ -19,6 +19,7 @@ public:
     virtual void handleClickEvent(const ClickEvent& event) override;
     virtual void handleDragEvent(const DragEvent& event) override;
 private:
+    touchgfx::Box playerIndicator;
     touchgfx::BitmapId mapBmpId;
     touchgfx::Image mapImg;
 

@@ -53,6 +53,10 @@ void GameScreenView::setupScreen()
     mapImg.setAlpha(255);
     mapImg.setWidthHeight(KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT);
     add(mapImg);
+    // Player position on minimap
+    playerIndicator = touchgfx::Box(10, 10, 0xFF0000, 255);
+    playerIndicator.setXY(0, 0);
+    add(playerIndicator);
 
     // Raycaster setup
     gameBmpId = Bitmap::dynamicBitmapCreate(KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT, Bitmap::RGB565);
@@ -87,7 +91,13 @@ void GameScreenView::handleTickEvent()
     //Raycaster::movePlayer();
 	Raycaster::render(gameFb);
 
-	gameImg.invalidate();
+	const Rect& playerRect = playerIndicator.getRect();
+    Rect mapRect = Rect(playerRect.x, playerRect.y, playerRect.width, playerRect.height);
+    mapImg.invalidateRect(mapRect);
+    Vec2 boxPx = Raycaster::playerPos.toScreenSpace();
+    playerIndicator.setXY(boxPx.x - playerRect.width / 2, boxPx.y - playerRect.width / 2);
+    playerIndicator.invalidateContent();
+    gameImg.invalidate();
 
     short fps = 60 / HAL::getInstance()->getLCDRefreshCount();
     short ms = static_cast<short>(round((1000.0f / fps)));
