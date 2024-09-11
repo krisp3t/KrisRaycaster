@@ -25,7 +25,7 @@ void GameScreenView::setupScreen()
     {
         touchgfx_printf("Failed to create dynamic bitmap for map\n");
     }
-    touchgfx_printf("Setting up map dynamic bitmap at 0x%p\n", Bitmap::dynamicBitmapGetAddress(mapBmpId));
+    touchgfx_printf("Map dynamic bitmap @ 0x%p\n", Bitmap::dynamicBitmapGetAddress(mapBmpId));
     memset(
         Bitmap::dynamicBitmapGetAddress(mapBmpId),
         0,
@@ -60,7 +60,7 @@ void GameScreenView::setupScreen()
 	{
 		touchgfx_printf("Failed to create dynamic bitmap for game\n");
 	}
-    touchgfx_printf("Setting up game dynamic bitmap at 0x%p\n", Bitmap::dynamicBitmapGetAddress(gameBmpId));
+    touchgfx_printf("Game dynamic bitmap @ 0x%p\n", Bitmap::dynamicBitmapGetAddress(gameBmpId));
     memset(
         Bitmap::dynamicBitmapGetAddress(gameBmpId), 
         0, 
@@ -71,6 +71,8 @@ void GameScreenView::setupScreen()
     gameImg.setAlpha(255);
     gameImg.setWidthHeight(KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT);
     add(gameImg);
+
+    touchgfx_printf("previoustouchpos: (%f, %f)\n", previousTouchPos.x, previousTouchPos.y);
 }
 
 void GameScreenView::tearDownScreen()
@@ -82,8 +84,9 @@ void GameScreenView::tearDownScreen()
 void GameScreenView::handleTickEvent()
 {
 	uint8_t *gameFb = Bitmap::dynamicBitmapGetAddress(gameBmpId);
-    Raycaster::movePlayer(VEC_FORWARD);
+    //Raycaster::movePlayer();
 	Raycaster::render(gameFb);
+
 	gameImg.invalidate();
 
     short fps = 60 / HAL::getInstance()->getLCDRefreshCount();
@@ -91,4 +94,43 @@ void GameScreenView::handleTickEvent()
     snprintf(debugStringBuffer, sizeof(debugStringBuffer), "%d fps (%d ms)", fps, ms);
     Application::getDebugPrinter()->setString(debugStringBuffer);
     Application::invalidateDebugRegion();
+}
+
+void GameScreenView::RotatePlayer(Vec2 evt)
+{
+    if (previousTouchPos.x == 0 && previousTouchPos.y == 0)
+	{
+		previousTouchPos = { KrisRaycaster::SCREEN_WIDTH + KrisRaycaster::SCREEN_WIDTH / 2, KrisRaycaster::SCREEN_HEIGHT / 2 };
+	}
+    Vec2f delta = { (evt.x - previousTouchPos.x) * 1.0f, (evt.y - previousTouchPos.y) * 1.0f };
+    touchgfx_printf("Prev: (%d, %d), evt: (%d, %d), Delta: (%f, %f)", previousTouchPos.x, previousTouchPos.y, evt.x, evt.y, delta.x, delta.y);
+    previousTouchPos = evt;
+
+    constexpr float sensitivity = 0.01f;
+    Raycaster::rotatePlayer(delta.x * sensitivity);
+}
+void GameScreenView::handleClickEvent(const ClickEvent& event)
+{
+    if (event.getType() == ClickEvent::RELEASED)
+    {
+        return;
+    }
+    Vec2 evt{event.getX(), event.getY()};
+    if (evt.x < KrisRaycaster::SCREEN_WIDTH)
+	{
+		return;
+	}
+    touchgfx_printf("Click event at (%d, %d)\n", evt.x, evt.y);
+    RotatePlayer(evt);
+}
+
+void GameScreenView::handleDragEvent(const DragEvent& event)
+{
+    Vec2 evt{ event.getNewX(), event.getNewY() };
+    if (evt.x < KrisRaycaster::SCREEN_WIDTH)
+    {
+        return;
+    }
+    touchgfx_printf("Drag event at (%d, %d)\n", evt.x, evt.y);
+    RotatePlayer(evt);
 }

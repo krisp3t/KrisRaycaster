@@ -1,10 +1,20 @@
 #ifndef KRISRAYCASTER_MATH_HPP
 #define KRISRAYCASTER_MATH_HPP
+#include <cmath>
 
 struct Vec2f
 {
 	float x;
 	float y;
+	void rotate(float angle)
+	{
+		float s = sinf(angle);
+		float c = cosf(angle);
+		float xnew = x * c - y * s;
+		float ynew = x * s + y * c;
+		x = xnew;
+		y = ynew;
+	}
 };
 
 struct Vec2

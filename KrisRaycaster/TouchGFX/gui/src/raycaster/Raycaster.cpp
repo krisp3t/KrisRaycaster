@@ -58,12 +58,12 @@ void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 
     }
 }
 
-void Raycaster::movePlayer(Vec2f deltaPos)
+void Raycaster::movePlayer()
 {
+    // making assumption of fixed 60fps, otherwise need to multiply by delta time
 	float moveSpeed = 0.01f;
-	float vecLen = sqrt(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y); // normalize deltaPos
-	Vec2f newPos = {playerPos.x + (deltaPos.x / vecLen) * moveSpeed,
-					playerPos.y + (deltaPos.y / vecLen) * moveSpeed};
+	Vec2f newPos = {playerPos.x + Raycaster::dir.x * moveSpeed,
+					playerPos.y + Raycaster::dir.y * moveSpeed};
 	if (MAP[static_cast<int>(newPos.x) + static_cast<int>(playerPos.y) * MAP_SIDE] == 0)
 	{
 		playerPos.x = newPos.x;
@@ -74,9 +74,18 @@ void Raycaster::movePlayer(Vec2f deltaPos)
 	}
 }
 
+void Raycaster::rotatePlayer(float angle)
+{
+	// making assumption of fixed 60fps, otherwise need to multiply by delta time
+    touchgfx_printf("Got rotation angle: %f\n", angle);
+    dir.rotate(angle);
+    cameraPlane.rotate(angle);
+}
+
 void Raycaster::render(uint8_t *framebuffer)
 {
     assert(framebuffer != nullptr && "Invalid framebuffer");
+
     auto fb = reinterpret_cast<uint16_t *>(framebuffer);
     touchgfx::Bitmap mapSource(BITMAP_WALL_ID);
     const uint16_t* texData = (const uint16_t*)mapSource.getData();
