@@ -3,6 +3,7 @@
 #include <gui/raycaster/Raycaster.hpp>
 #include <gui/common/globals.hpp>
 #include <gui/raycaster/Picture.hpp>
+#include <images/BitmapDatabase.hpp>
 #include <touchgfx/Utils.hpp>
 
 Vec2f Raycaster::playerPos = {2, 11};
@@ -30,6 +31,7 @@ touchgfx::Rect Raycaster::getMapRect(uint8_t cellType)
 
 void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 destSize)
 {
+    assert(src != nullptr && dest != nullptr && "Invalid src/dest buffer");
     int16_t destX = 0;
     int16_t destY = 0;
     int16_t scaleX = destSize.x / MAP_SIDE;
@@ -58,7 +60,11 @@ void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 
 
 void Raycaster::render(uint8_t *framebuffer)
 {
+    assert(framebuffer != nullptr && "Invalid framebuffer");
     auto fb = reinterpret_cast<uint16_t *>(framebuffer);
+    touchgfx::Bitmap mapSource(BITMAP_WALL_ID);
+    const uint16_t* texData = (const uint16_t*)mapSource.getData();
+
     // ceiling
     drawHLines(fb, 0, 0, KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT / 2, 0xf800, 0xf7e0);
     // floor
@@ -68,7 +74,7 @@ void Raycaster::render(uint8_t *framebuffer)
     Vec2f dir = Raycaster::dir;                 // direction vector of player
     Vec2f cameraPlane = Raycaster::cameraPlane; // perpendicular to dir, magnitude defines FOV
     int mapSize = MAP_SIDE;
-    for (int screenCol = 0; screenCol < SCREEN_WIDTH; screenCol++)
+    for (int16_t screenCol = 0; screenCol < SCREEN_WIDTH; screenCol++)
     {
         int wallType = 0;
         // if FOV=60 and fbWidth=720, then angle from [-30, 30] with increments of 60/720
@@ -116,19 +122,24 @@ void Raycaster::render(uint8_t *framebuffer)
         // 4. When collision found, calculate distance to wall.
         // Subtract one tile, because collision actually happens at edge of wall (position + size of tile).
         float distance = isHitVertical ? totalDist.y - deltaFactor.y : totalDist.x - deltaFactor.x;
-        int wallHeight = static_cast<int>(floor(SCREEN_HEIGHT / fmax(distance, 1.0)));
+        int16_t wallHeight = static_cast<int>(floor(SCREEN_HEIGHT / fmax(distance, 1.0)));
         float collisionAt = isHitVertical ? playerPos.x + rayDir.x * distance : playerPos.y + rayDir.y * distance;
         collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
         // brightness at distance 1 max, across whole map almost 0
-        //float brightness = pow(((mapSize + 1) - distance) / mapSize, 2);
-
+        float brightness = (((mapSize + 1) - distance) / mapSize) * (((mapSize + 1) - distance) / mapSize);
+        int16_t rectY = SCREEN_HEIGHT / 2 - wallHeight / 2;
         // walls
-        drawVLine(fb, screenCol, SCREEN_HEIGHT / 2 - wallHeight / 2, wallHeight, 2);
+        drawVLine(
+            texData,
+            fb, 
+            touchgfx::Rect{ screenCol, rectY, 1, wallHeight },
+            wallType);
     }
 }
 
 void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color)
 {
+    assert(fb != nullptr && "Invalid framebuffer");
     assert(x < SCREEN_WIDTH && y < SCREEN_HEIGHT && "Invalid coordinates");
     assert(width <= SCREEN_WIDTH && width > 0 && "Invalid width");
     assert(height <= SCREEN_HEIGHT && height > 0 && "Invalid height");
@@ -142,6 +153,7 @@ void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width,
 
 void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t fromColor, uint16_t toColor)
 {
+    assert(fb != nullptr && "Invalid framebuffer");
 	assert(x < SCREEN_WIDTH && y < SCREEN_HEIGHT && "Invalid coordinates");
 	assert(width <= SCREEN_WIDTH && width > 0 && "Invalid width");
 	assert(height <= SCREEN_HEIGHT && height > 0 && "Invalid height");
@@ -167,25 +179,18 @@ void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width,
 	}
 }
 
-void Raycaster::drawVLine(uint16_t *fb, uint16_t x, uint16_t y, uint16_t height, uint8_t wallType)
+void Raycaster::drawVLine(const uint16_t* texFb, uint16_t* fb, touchgfx::Rect destRect, uint8_t wallType)
 {
-    assert(x < SCREEN_WIDTH && y < SCREEN_HEIGHT && "Invalid coordinates");
-    assert(height <= SCREEN_HEIGHT && height > 0 && "Invalid height");
-    uint16_t color = 0;
-    switch (wallType)
-    {
-    case 1:
-        color = 0xF800;
-        break;
-    case 0:
-        color = 0x07E0;
-        break;
-    case 2:
-        color = 0x001F;
-        break;
-    }
-    for (uint16_t i = 0; i < height; i++)
-    {
-        fb[KrisRaycaster::SCREEN_WIDTH * (y + i) + x] = color;
-    }
+    assert(texFb != nullptr && fb != nullptr && "Invalid src/dest buffer");
+    assert(destRect.x < SCREEN_WIDTH && "Invalid coordinates");
+    assert(destRect.y + destRect.height <= SCREEN_HEIGHT && destRect.height > 0 && "Invalid height");
+    auto texRect = getMapRect(wallType);
+    Picture::copySrcDestRect(
+	    texFb,
+		fb,
+		Vec2{TEXTURE_ATLAS_SIDE, TEXTURE_ATLAS_SIDE},
+		Vec2{SCREEN_WIDTH, SCREEN_HEIGHT},
+		texRect,
+		destRect
+	);
 }

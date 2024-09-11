@@ -7,6 +7,9 @@ namespace Picture
 {
     void copySrcDest(const uint16_t *src, uint16_t *dest, Vec2 srcSize, Vec2 destSize, Vec2 srcPos, Vec2 destPos)
     {
+        assert(src != nullptr &&
+            dest != nullptr &&
+            "Invalid src/dest buffer");
         for (uint16_t y = 0; y < destSize.y; y++)
         {
 	        for (uint16_t x = 0; x < destSize.x; x++)
@@ -31,6 +34,15 @@ namespace Picture
         float scaleX = static_cast<float>(srcRect.width) / destRect.width;
         float scaleY = static_cast<float>(srcRect.height) / destRect.height;
 
+        assert(src != nullptr &&
+			   dest != nullptr &&
+			   "Invalid src/dest buffer");
+        assert(srcRect.x + srcRect.width <= srcSize.x &&
+			   srcRect.y + srcRect.height <= srcSize.y &&
+			   destRect.x + destRect.width <= destSize.x &&
+			   destRect.y + destRect.height <= destSize.y &&
+			   "Invalid input coordinates");
+
         for (uint16_t destY = destRect.y; destY < destRect.y + destRect.height; destY++)
         {
             for (uint16_t destX = destRect.x; destX < destRect.x + destRect.width; destX++)
@@ -38,12 +50,11 @@ namespace Picture
                 uint16_t srcX = static_cast<uint16_t>((destX - destRect.x) * scaleX) + srcRect.x;
                 uint16_t srcY = static_cast<uint16_t>((destY - destRect.y) * scaleY) + srcRect.y;
 
-                
-                assert(srcX <= srcSize.x &&
-                       srcY <= srcSize.y &&
-                       destX <= destSize.x &&
-                       destY <= destSize.y &&
-                       "Invalid coordinates");
+                assert(srcX < srcSize.x &&
+					   srcY < srcSize.y &&
+					   destX < destSize.x &&
+					   destY < destSize.y &&
+					   "Invalid output coordinates");
                 dest[destY * destSize.x + destX] = src[srcY * srcSize.x + srcX];
             }
         }
