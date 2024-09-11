@@ -13,4 +13,9 @@ struct Vec2
 	int y;
 };
 
+constexpr Vec2f VEC_FORWARD = {0, -1};
+constexpr Vec2f VEC_RIGHT = {1, 0};
+constexpr Vec2f VEC_BACKWARD = {0, 1};
+constexpr Vec2f VEC_LEFT = {-1, 0};
+
 #endif

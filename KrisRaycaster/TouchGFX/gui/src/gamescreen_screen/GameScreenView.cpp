@@ -82,8 +82,7 @@ void GameScreenView::tearDownScreen()
 void GameScreenView::handleTickEvent()
 {
 	uint8_t *gameFb = Bitmap::dynamicBitmapGetAddress(gameBmpId);
-    //Raycaster::playerPos.x += 0.01f;
-    //Raycaster::playerPos.y -= 0.01f;
+    Raycaster::movePlayer(VEC_FORWARD);
 	Raycaster::render(gameFb);
 	gameImg.invalidate();
 

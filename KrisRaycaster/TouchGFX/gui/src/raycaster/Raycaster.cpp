@@ -58,6 +58,22 @@ void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 
     }
 }
 
+void Raycaster::movePlayer(Vec2f deltaPos)
+{
+	float moveSpeed = 0.01f;
+	float vecLen = sqrt(deltaPos.x * deltaPos.x + deltaPos.y * deltaPos.y); // normalize deltaPos
+	Vec2f newPos = {playerPos.x + (deltaPos.x / vecLen) * moveSpeed,
+					playerPos.y + (deltaPos.y / vecLen) * moveSpeed};
+	if (MAP[static_cast<int>(newPos.x) + static_cast<int>(playerPos.y) * MAP_SIDE] == 0)
+	{
+		playerPos.x = newPos.x;
+	}
+	if (MAP[static_cast<int>(playerPos.x) + static_cast<int>(newPos.y) * MAP_SIDE] == 0)
+	{
+		playerPos.y = newPos.y;
+	}
+}
+
 void Raycaster::render(uint8_t *framebuffer)
 {
     assert(framebuffer != nullptr && "Invalid framebuffer");
@@ -133,7 +149,10 @@ void Raycaster::render(uint8_t *framebuffer)
             texData,
             fb, 
             touchgfx::Rect{ screenCol, rectY, 1, wallHeight },
-            wallType);
+            wallType,
+        	collisionAt,
+            brightness
+        );
     }
 }
 
@@ -179,12 +198,13 @@ void Raycaster::drawHLines(uint16_t* fb, uint16_t x, uint16_t y, uint16_t width,
 	}
 }
 
-void Raycaster::drawVLine(const uint16_t* texFb, uint16_t* fb, touchgfx::Rect destRect, uint8_t wallType)
+void Raycaster::drawVLine(const uint16_t* texFb, uint16_t* fb, touchgfx::Rect destRect, uint8_t wallType, float collisionAt, float brightness)
 {
     assert(texFb != nullptr && fb != nullptr && "Invalid src/dest buffer");
     assert(destRect.x < SCREEN_WIDTH && "Invalid coordinates");
     assert(destRect.y + destRect.height <= SCREEN_HEIGHT && destRect.height > 0 && "Invalid height");
     auto texRect = getMapRect(wallType);
+    texRect.x += static_cast<int>(collisionAt * texRect.width);
     Picture::copySrcDestRect(
 	    texFb,
 		fb,
