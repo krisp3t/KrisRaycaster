@@ -58,12 +58,12 @@ void Raycaster::initMap(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 
     }
 }
 
-void Raycaster::movePlayer()
+void Raycaster::movePlayer(float speedMultiplier)
 {
     // making assumption of fixed 60fps, otherwise need to multiply by delta time
-	float moveSpeed = 0.01f;
-	Vec2f newPos = {playerPos.x + Raycaster::dir.x * moveSpeed,
-					playerPos.y + Raycaster::dir.y * moveSpeed};
+    constexpr float baseSpeed = 0.01f;
+    Vec2f newPos = { playerPos.x + Raycaster::dir.x * baseSpeed * speedMultiplier,
+                     playerPos.y + Raycaster::dir.y * baseSpeed * speedMultiplier };
 	if (MAP[static_cast<int>(newPos.x) + static_cast<int>(playerPos.y) * MAP_SIDE] == 0)
 	{
 		playerPos.x = newPos.x;

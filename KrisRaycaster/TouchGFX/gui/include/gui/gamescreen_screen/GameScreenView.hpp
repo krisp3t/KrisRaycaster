@@ -15,9 +15,10 @@ public:
     virtual void setupScreen();
     virtual void tearDownScreen();
     virtual void handleTickEvent();
-    void RotatePlayer(Vec2 evt);
+    void TransformPlayer(Vec2 evt);
     virtual void handleClickEvent(const ClickEvent& event) override;
     virtual void handleDragEvent(const DragEvent& event) override;
+    virtual void handleGestureEvent(const GestureEvent& event) override;
 private:
     touchgfx::Box playerIndicator;
     touchgfx::BitmapId mapBmpId;
@@ -25,7 +26,7 @@ private:
 
 	touchgfx::BitmapId gameBmpId;
     touchgfx::Image gameImg;
-    Vec2 previousTouchPos = { KrisRaycaster::SCREEN_WIDTH + KrisRaycaster::SCREEN_WIDTH / 2, KrisRaycaster::SCREEN_HEIGHT / 2 };
+    Vec2 previousTouchPos = { 0, 0 };
 };
 
 #endif // GAMESCREENVIEW_HPP
