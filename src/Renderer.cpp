@@ -44,8 +44,8 @@ namespace KrisRaycaster
 
         // TODO: come up with better texture architecture
         auto wallSurfId = CreateTexture("./map/minecraft/wall.png",
-            TextureFormat{ 32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888 });
-        Map* map = Game::Get().systems.map.get();
+                                        TextureFormat{32, 32, 256, 16, SDL_PIXELFORMAT_ABGR8888});
+        Map *map = Game::Get().systems.map.get();
         map->wallTexId = wallSurfId;
         return 0;
     }
@@ -53,7 +53,7 @@ namespace KrisRaycaster
     size_t Renderer::CreateTexture(
         TextureFormat format)
     {
-        items.push_back(Texture{ format });
+        items.push_back(Texture{format});
         return items.size() - 1;
     }
 
@@ -61,7 +61,7 @@ namespace KrisRaycaster
         const std::string &filename,
         TextureFormat format)
     {
-        items.push_back(Texture{ filename, format });
+        items.push_back(Texture{filename, format});
         return items.size() - 1;
     }
 
@@ -70,7 +70,7 @@ namespace KrisRaycaster
         TextureFormat format,
         SDL_Renderer &rend)
     {
-        items.push_back(Texture{ filename, format, rend });
+        items.push_back(Texture{filename, format, rend});
         return items.size() - 1;
     }
 
@@ -287,19 +287,19 @@ namespace KrisRaycaster
             float brightness = pow(((mapSize + 1) - distance) / mapSize, 2);
 
             // ceiling
-            DrawVLine(screenCol, 0, settings.framebufferHeight / 2,  0x9C8255, 0xFF3E1016);
+            DrawVLine(screenCol, 0, settings.framebufferHeight / 2, 0x9C8255, 0xFF3E1016);
             // floor
             DrawVLine(screenCol, settings.framebufferHeight / 2,
-                settings.framebufferHeight / 2, 0xFF000000, 0xFF110E1A);
+                      settings.framebufferHeight / 2, 0xFF000000, 0xFF110E1A);
             // walls
             DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt, brightness);
-
         }
     }
 
     void Renderer::DrawVLine(int x, int y, int height, uint32_t color)
     {
-        if (height <= 0) {
+        if (height <= 0)
+        {
             return;
         }
         assert((y >= 0 && y < settings.framebufferHeight));
@@ -315,7 +315,8 @@ namespace KrisRaycaster
     void Renderer::DrawVLine(int x, int y, int height, uint32_t fromColor, uint32_t toColor)
     {
         constexpr short stepSize = 4;
-        if (height <= 0) {
+        if (height <= 0)
+        {
             return;
         }
         assert((y >= 0 && y < settings.framebufferHeight));
@@ -334,8 +335,10 @@ namespace KrisRaycaster
 
         uint32_t currentColor = fromColor;
 
-        for (int i = 0; i < height; i++) {
-            if (i % stepSize == 0) {
+        for (int i = 0; i < height; i++)
+        {
+            if (i % stepSize == 0)
+            {
                 const float t = static_cast<float>(i) / (height - 1);
 
                 // Linear interpolation
@@ -345,13 +348,11 @@ namespace KrisRaycaster
                 uint8_t r = static_cast<uint8_t>((1.0f - t) * fromR + t * toR);
 
                 currentColor = (a << 24) | (b << 16) | (g << 8) | r;
-
             }
             int iy = y + i;
             framebuffer[iy * settings.framebufferWidth + x] = currentColor;
         }
     }
-
 
     void Renderer::DrawVLine(int x, int y, int height, int wallType, float collisionAt, float brightness)
     {
@@ -363,11 +364,11 @@ namespace KrisRaycaster
         int spriteW = wallSurf->format.spriteW;
         int spriteH = wallSurf->format.spriteH;
         int spriteRow = wallType / wallSurf->format.rowCount;
-    	int spriteCol = wallType % wallSurf->format.rowCount - 1;
+        int spriteCol = wallType % wallSurf->format.rowCount - 1;
         int rowPixels = wallSurf->format.rowCount * spriteW;
         Vec2 spriteStart = {
-        	spriteCol * spriteW + static_cast<int>(collisionAt * spriteW),
-        	spriteRow * rowPixels};
+            spriteCol * spriteW + static_cast<int>(collisionAt * spriteW),
+            spriteRow * rowPixels};
         uint32_t *px = static_cast<uint32_t *>(wallSurf->surf->pixels); // TODO: separate function, boundary checks...
         px += spriteStart.y * spriteW + spriteStart.x;
         float texStep = static_cast<float>(spriteH) / static_cast<float>(height);
