@@ -7,6 +7,12 @@
 #include <gui/raycaster/Math.hpp>
 #include "gui/common/globals.hpp"
 
+enum class PlayerDirection
+{
+	FORWARDS = -1,
+	BACKWARDS = 1,
+	STOPPED = 0
+};
 class GameScreenView : public GameScreenViewBase
 {
 public:
@@ -18,7 +24,6 @@ public:
     void TransformPlayer(Vec2 evt);
     virtual void handleClickEvent(const ClickEvent& event) override;
     virtual void handleDragEvent(const DragEvent& event) override;
-    virtual void handleGestureEvent(const GestureEvent& event) override;
 private:
     touchgfx::Box playerIndicator;
     touchgfx::BitmapId mapBmpId;
@@ -27,6 +32,7 @@ private:
 	touchgfx::BitmapId gameBmpId;
     touchgfx::Image gameImg;
     Vec2 previousTouchPos = { 0, 0 };
+    PlayerDirection playerDir = PlayerDirection::STOPPED;
 };
 
 #endif // GAMESCREENVIEW_HPP

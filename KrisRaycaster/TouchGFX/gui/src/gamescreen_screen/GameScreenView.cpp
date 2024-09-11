@@ -88,7 +88,7 @@ void GameScreenView::tearDownScreen()
 void GameScreenView::handleTickEvent()
 {
 	uint8_t *gameFb = Bitmap::dynamicBitmapGetAddress(gameBmpId);
-    Raycaster::movePlayer(1.05f);
+    Raycaster::movePlayer(static_cast<float>(playerDir));
 	Raycaster::render(gameFb);
 
 	const Rect& playerRect = playerIndicator.getRect();
@@ -114,13 +114,21 @@ void GameScreenView::TransformPlayer(Vec2 evt)
         return;
 	}
     Vec2f delta = { (evt.x - previousTouchPos.x) * 1.0f, (evt.y - previousTouchPos.y) * 1.0f };
-    touchgfx_printf("Prev: (%d, %d), evt: (%d, %d), Delta: (%f, %f)", previousTouchPos.x, previousTouchPos.y, evt.x, evt.y, delta.x, delta.y);
+    float length = sqrt(delta.x * delta.x + delta.y * delta.y);
+    // Deadzone
+    if (length < 3.0f)
+    {
+        return;
+    }
+    touchgfx_printf("Prev: (%d, %d), evt: (%d, %d), Delta: (%f, %f), len: %f", previousTouchPos.x, previousTouchPos.y, evt.x, evt.y, delta.x, delta.y, length);
     previousTouchPos = evt;
 
     constexpr float rotateSensitivity = 0.02f;
-    constexpr float moveSensitivity = 0.05f;
     Raycaster::rotatePlayer(delta.x * rotateSensitivity);
-    //Raycaster::movePlayer(-delta.y * moveSensitivity);
+    if (abs(delta.y) > 3)
+    {
+        playerDir = delta.y > 0 ? PlayerDirection::FORWARDS : PlayerDirection::BACKWARDS;
+    }
 }
 void GameScreenView::handleClickEvent(const ClickEvent& event)
 {
@@ -128,39 +136,13 @@ void GameScreenView::handleClickEvent(const ClickEvent& event)
 	{
         touchgfx_printf("Click event released\n");
 		previousTouchPos = { 0, 0 };
+        playerDir = PlayerDirection::STOPPED;
 	}
-    if (event.getType() != ClickEvent::PRESSED)
-    {
-        return;
-    }
-    Vec2 evt{event.getX(), event.getY()};
-    if (evt.x < KrisRaycaster::SCREEN_WIDTH)
-	{
-		return;
-	}
-    touchgfx_printf("Click event at (%d, %d)\n", evt.x, evt.y);
-    //TransformPlayer(evt);
 }
 
 void GameScreenView::handleDragEvent(const DragEvent& event)
 {
     Vec2 evt{ event.getNewX(), event.getNewY() };
-    if (evt.x < KrisRaycaster::SCREEN_WIDTH)
-    {
-        return;
-    }
     touchgfx_printf("Drag event at (%d, %d)\n", evt.x, evt.y);
     TransformPlayer(evt);
-}
-
-void GameScreenView::handleGestureEvent(const GestureEvent& event)
-{
-	if (event.getType() != GestureEvent::SWIPE_HORIZONTAL)
-	{
-        return;
-	}
-    constexpr float rotateSensitivity = 0.01f;
-    float velocity = event.getVelocity();
-    Raycaster::rotatePlayer(velocity * rotateSensitivity);
-    touchgfx_printf("Swipe horizontal\n");
 }
