@@ -77,7 +77,7 @@ void Raycaster::movePlayer(float speedMultiplier)
 void Raycaster::rotatePlayer(float angle)
 {
 	// making assumption of fixed 60fps, otherwise need to multiply by delta time
-    touchgfx_printf("Got rotation angle: %f\n", angle);
+    //touchgfx_printf("Got rotation angle: %f\n", angle);
     dir.rotate(angle);
     cameraPlane.rotate(angle);
 }
@@ -220,6 +220,7 @@ void Raycaster::drawVLine(const uint16_t* texFb, uint16_t* fb, touchgfx::Rect de
 		Vec2{TEXTURE_ATLAS_SIDE, TEXTURE_ATLAS_SIDE},
 		Vec2{SCREEN_WIDTH, SCREEN_HEIGHT},
 		texRect,
-		destRect
+		destRect,
+        brightness
 	);
 }

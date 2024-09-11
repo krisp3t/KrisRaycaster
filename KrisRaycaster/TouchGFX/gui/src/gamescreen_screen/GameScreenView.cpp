@@ -75,8 +75,6 @@ void GameScreenView::setupScreen()
     gameImg.setAlpha(255);
     gameImg.setWidthHeight(KrisRaycaster::SCREEN_WIDTH, KrisRaycaster::SCREEN_HEIGHT);
     add(gameImg);
-
-    touchgfx_printf("previoustouchpos: (%f, %f)\n", previousTouchPos.x, previousTouchPos.y);
 }
 
 void GameScreenView::tearDownScreen()
@@ -120,7 +118,7 @@ void GameScreenView::TransformPlayer(Vec2 evt)
     {
         return;
     }
-    touchgfx_printf("Prev: (%d, %d), evt: (%d, %d), Delta: (%f, %f), len: %f", previousTouchPos.x, previousTouchPos.y, evt.x, evt.y, delta.x, delta.y, length);
+    //touchgfx_printf("Prev: (%d, %d), evt: (%d, %d), Delta: (%f, %f), len: %f", previousTouchPos.x, previousTouchPos.y, evt.x, evt.y, delta.x, delta.y, length);
     previousTouchPos = evt;
 
     constexpr float rotateSensitivity = 0.02f;
@@ -143,6 +141,6 @@ void GameScreenView::handleClickEvent(const ClickEvent& event)
 void GameScreenView::handleDragEvent(const DragEvent& event)
 {
     Vec2 evt{ event.getNewX(), event.getNewY() };
-    touchgfx_printf("Drag event at (%d, %d)\n", evt.x, evt.y);
+    //touchgfx_printf("Drag event at (%d, %d)\n", evt.x, evt.y);
     TransformPlayer(evt);
 }

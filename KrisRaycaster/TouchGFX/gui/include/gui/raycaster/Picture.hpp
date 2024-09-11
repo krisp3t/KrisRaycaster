@@ -12,5 +12,7 @@ namespace Picture
 {
 	void copySrcDest(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 destSize, Vec2 srcPos, Vec2 destPos);
 	void copySrcDestRect(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 destSize, touchgfx::Rect srcRect, touchgfx::Rect destRect);
+	void copySrcDestRect(const uint16_t* src, uint16_t* dest, Vec2 srcSize, Vec2 destSize, touchgfx::Rect srcRect, touchgfx::Rect destRect, float brightness);
+	uint16_t applyBrightness(uint16_t color, float brightness);
 }
 #endif
