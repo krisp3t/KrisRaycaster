@@ -3,6 +3,11 @@ Raycaster 3D renderer (Wolfenstein 3D style) for STM32 embedded platform. The ai
 
 Uses TouchGFX on STM32 and SDL2 on desktop to send pixels to screen.
 
+# Preview
+[![3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://img.youtube.com/vi/vQCsKNYGYew/0.jpg)](https://www.youtube.com/watch?v=vQCsKNYGYew)
+
+[YouTube: 3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://www.youtube.com/watch?v=vQCsKNYGYew)
+
 # Compatibility
 Tested on STM32H750-DK (480 MHz, 480x272 LCD-TFT, 1MB RAM). It also has DMA2D capabilities for HW acceleration.
 I don't have access to any other boards, so support may vary.
