@@ -30,7 +30,7 @@ Open the `TouchGFX` folder in `src/stm32-touchgfx` directory. Open `KrisRaycaste
 You can open the simulator build in `simulator/msvs/Application.vcxproj` with Visual Studio for faster development.
 To flash the app on your board, open the project in TouchGFX Designer (you should see GameScreen) and flash it from there.
 
-## Desktop (SLD2)
+## Desktop (SDL2)
 This project uses `vcpkg` toolchain to manage dependencies (SDL2) and `CMake` as a build system.
 
 If you have `vcpkg` installed already, you can use the global path as your `VCPKG_ROOT` in `CMakeUserPresets.json`. Otherwise, the git submodule will be used.
