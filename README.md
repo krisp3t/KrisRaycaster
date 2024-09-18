@@ -1,7 +1,16 @@
 # KrisRaycaster
-Raycaster 3D renderer (Wolfenstein 3D style) for STM32 embedded platform. The aim of the project is to play around with 1990's rendering techniques in an environment that has very limited resources.
+# Overview
+A fun project I came up with to get started with embedded programming on STM32 platform!
 
-Uses TouchGFX on STM32 and SDL2 on desktop to send pixels to screen.
+**KrisRaycaster** is a game built for STM32 microcontrollers. You can also run it in TouchGFX's simulator on Windows or through SDL2 on any supported x86 platform (Windows, MacOS, Linux).
+
+Inspiration for the game are early 3D shooters, such as id Software's [Wolfenstein 3D](https://en.wikipedia.org/wiki/Wolfenstein_3D). These games were developed before the advent of dedicated graphics hardware, so all rendering was handled in software, drawing each pixel without the help of a modern graphics pipeline.
+
+True 3D rendering without a GPU is quite slow, but **ray casting** is a very fast algorithm that could be easily used back then. It is considered 2.5D (pseudo-3D), since it simulates 3D visuals using a 2D map by casting a ray for every vertical slice of the screen until they hit a solid object. This creates an illusion of depth and perspective.
+
+This project is educational in nature, and though it can be further optimized, my primary goal was to learn the ray casting technique and familiarize myself with the STM32 development ecosystem. It's rewarding to create visually appealing results on a platform with limited resources compared to modern handheld consoles.
+
+I hope to inspire you to tinker and explore further on your own!
 
 # Preview
 [![3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://img.youtube.com/vi/vQCsKNYGYew/0.jpg)](https://www.youtube.com/watch?v=vQCsKNYGYew)
@@ -9,8 +18,11 @@ Uses TouchGFX on STM32 and SDL2 on desktop to send pixels to screen.
 [YouTube: 3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://www.youtube.com/watch?v=vQCsKNYGYew)
 
 # Compatibility
-Tested on STM32H750-DK (480 MHz, 480x272 LCD-TFT, 1MB RAM). It also has DMA2D capabilities for HW acceleration.
-I don't have access to any other boards, so support may vary.
+Tested on [STM32H750-DK](https://www.st.com/en/evaluation-tools/stm32h750b-dk.html) (480 MHz, 480x272 LCD-TFT, 1MB RAM, 128KB Flash). It also has DMA2D capabilities for HW acceleration.
+
+I don't have access to any other boards, so support may vary. 
+
+Having a screen is certainly required, and also enough memory for framebuffers and texture atlas. If your board has less memory, you could try using a single buffer or lowering the resolution of the game.
 
 # Build
 ## STM32
@@ -18,7 +30,7 @@ Open the `TouchGFX` folder in `src/stm32-touchgfx` directory. Open `KrisRaycaste
 You can open the simulator build in `simulator/msvs/Application.vcxproj` with Visual Studio for faster development.
 To flash the app on your board, open the project in TouchGFX Designer (you should see GameScreen) and flash it from there.
 
-## Desktop
+## Desktop (SLD2)
 This project uses `vcpkg` toolchain to manage dependencies (SDL2) and `CMake` as a build system.
 
 If you have `vcpkg` installed already, you can use the global path as your `VCPKG_ROOT` in `CMakeUserPresets.json`. Otherwise, the git submodule will be used.
