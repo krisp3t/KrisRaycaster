@@ -18,6 +18,14 @@ namespace KrisRaycaster
             {
                 hasQuit = true;
             }
+            else if (event.type == SDL_WINDOWEVENT)
+            {
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED ||
+                    event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                    Renderer::Get().ResizeWindow(event.window.data1, event.window.data2);
+                }
+            }
         }
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
         if (currentKeyStates[SDL_SCANCODE_W])
@@ -40,6 +48,7 @@ namespace KrisRaycaster
 
     void Game::Update(double deltaTime)
     {
+        // TODO: move event handling from ProcessInput...
     }
 
     void Game::Render(double deltaTime)

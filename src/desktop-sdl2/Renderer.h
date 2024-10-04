@@ -35,9 +35,7 @@ namespace KrisRaycaster
 
         void Render(double d);
 
-        void Update();
-
-        bool ProcessInput();
+        void ResizeWindow(const int width, const int height);
 
         size_t CreateTexture(const std::string &filename, TextureFormat format);
 

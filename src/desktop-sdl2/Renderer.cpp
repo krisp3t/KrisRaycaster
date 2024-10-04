@@ -50,6 +50,24 @@ namespace KrisRaycaster
         return 0;
     }
 
+    void Renderer::ResizeWindow(const int width, const int height)
+    {
+        settings.screenWidth = width;
+		settings.screenHeight = height;
+		settings.framebufferWidth = width / 2;
+		settings.framebufferHeight = height;
+		framebuffer = std::vector<uint32_t>(settings.framebufferWidth * settings.framebufferHeight, 0);
+		SDL_DestroyTexture(framebufferTexture);
+		framebufferTexture = SDL_CreateTexture(
+			sdlRend,
+			SDL_PIXELFORMAT_ABGR8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			settings.framebufferWidth,
+			settings.framebufferHeight);
+		leftRec = SDL_Rect{0, 0, settings.framebufferWidth, settings.framebufferHeight};
+		rightRec = SDL_Rect{settings.framebufferWidth, 0, settings.framebufferWidth, settings.framebufferHeight};
+    }
+
     size_t Renderer::CreateTexture(
         TextureFormat format)
     {
@@ -217,8 +235,8 @@ namespace KrisRaycaster
 
     void Renderer::CastRaysDDA()
     {
-        rays = std::vector<SDL_Point>{};
-        rays.reserve(settings.framebufferWidth * 2);
+        //rays = std::vector<SDL_Point>{};
+        //rays.reserve(settings.framebufferWidth * 2);
         Map *map = Game::Get().systems.map.get();
         Vec2f playerPos = map->playerPos;
         Vec2f dir = map->dir;                 // direction vector of player
@@ -455,6 +473,7 @@ namespace KrisRaycaster
                           static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
         SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
         // display fps and resolution
+        // TODO: replace with bitmap font?
         const int fps = static_cast<int>(floor(1.0f / deltaTime));
         const int time = static_cast<int>(floor(deltaTime * 1000));
         std::ostringstream stringStream;
