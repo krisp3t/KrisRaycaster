@@ -43,10 +43,44 @@ Having a screen is certainly required, and also enough memory for framebuffers a
 - To flash the app on your board, open the project in TouchGFX Designer (you should see GameScreen) and flash it from there.
 
 ## Desktop (SDL2)
-This project uses `vcpkg` toolchain to manage dependencies (SDL2) and `CMake` as a build system.
+This project uses `vcpkg` package manager with `ninja` toolchain to manage dependencies (SDL2) and `CMake` as a build system.
 
-If you have `vcpkg` installed already, you can use the global path as your `VCPKG_ROOT` in `CMakeUserPresets.json`. Otherwise, the git submodule will be used.
+### vcpkg-system
+If you have `vcpkg` installed already, you can use cmake profile `vcpkg-system` that will use global environment variable `VCPKG_ROOT`.
 
-Make sure to clone the repository with: `git clone --recursive`. If you have already cloned the project, run `git submodule update --recursive --remote`.
+### vcpkg-submodule
+You can also use `vcpkg-submodule` to use vcpkg as git submodule. In this case, `vcpkg` will be downloaded in `extern/vcpkg`. 
+- If you're using the submodule, make sure to clone the repository with: `git clone --recursive`.
+- If you have already cloned the project, run `git submodule update --recursive --remote`.
 
-The project uses `ninja` generator. It should automatically be found when using IDEs such as Visual Studio and CLion. When using VSCode on Windows, you might have to install it (`choco install ninja`) and make sure it's in the PATH.
+CMake will be automatically run when using IDEs such as Visual Studio, VSCode (with CMake extensions) and CLion. 
+- You can also run it through console with `cmake --preset vcpkg-submodule`.
+
+### Windows
+If `ninja` is not installed, you will need to install it (e.g. `choco install ninja`) and make sure it's in the PATH.
+
+### Mac
+You can install `ninja` with `brew install ninja`.
+
+### Linux
+On Ubuntu, `ninja` is installed with `sudo apt install ninja-build`. If using another distribution, find the equivalent package.
+You might need to add `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` to `cacheVariables` in `CMakePresets.json`, for example:
+```json
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "vcpkg-system",
+            "binaryDir": "${sourceDir}/build",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        }
+    ]
+}
+```
