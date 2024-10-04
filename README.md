@@ -53,8 +53,9 @@ You can also use `vcpkg-submodule` to use vcpkg as git submodule. In this case, 
 - If you're using the submodule, make sure to clone the repository with: `git clone --recursive`.
 - If you have already cloned the project, run `git submodule update --recursive --remote`.
 
+### Running CMAKE
 CMake will be automatically run when using IDEs such as Visual Studio, VSCode (with CMake extensions) and CLion. 
-- You can also run it through console with `cmake --preset vcpkg-submodule`.
+- You can also run it through console with `cmake --preset vcpkg-submodule` and `cmake --build build`.
 
 ### Windows
 If `ninja` is not installed, you will need to install it (e.g. `choco install ninja`) and make sure it's in the PATH.
