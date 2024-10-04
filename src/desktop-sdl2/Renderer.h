@@ -62,6 +62,8 @@ namespace KrisRaycaster
 
         void DrawFrame();
 
+        void AfterFrame();
+
         SDL_Rect leftRec;
         SDL_Rect rightRec;
 
@@ -72,6 +74,8 @@ namespace KrisRaycaster
         void DrawVLine(int x, int y, int height, uint32_t color);
     	void DrawVLine(int x, int y, int height, uint32_t fromColor, uint32_t toColor);
         void DrawVLine(int x, int y, int height, int wallType, float collisionAt, float brightness);
+
+        void DrawHLines(int x, int y, int height, uint32_t fromColor, uint32_t toColor);
 
 
         void DrawPlayerMinimap();

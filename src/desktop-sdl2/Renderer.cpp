@@ -224,6 +224,11 @@ namespace KrisRaycaster
         Vec2f dir = map->dir;                 // direction vector of player
         Vec2f cameraPlane = map->cameraPlane; // perpendicular to dir, magnitude defines FOV
         int mapSize = Game::Get().systems.map->GetSize();
+
+        // Draw ceiling
+        DrawHLines(0, 0, settings.framebufferHeight / 2, 0xFF0000FF, 0xFF00FFF7);
+        // Draw floor
+        DrawHLines(0, settings.framebufferHeight / 2, settings.framebufferHeight / 2, 0x100419, 0x080808);
         for (int screenCol = 0; screenCol < settings.framebufferWidth; screenCol++)
         {
             int wallType = 0;
@@ -284,14 +289,9 @@ namespace KrisRaycaster
             float collisionAt = isHitVertical ? playerPos.x + rayDir.x * distance : playerPos.y + rayDir.y * distance;
             collisionAt = collisionAt - floor(collisionAt); // [0.0f, 1.0f]
             // brightness at distance 1 max, across whole map almost 0
-            float brightness = pow(((mapSize + 1) - distance) / mapSize, 2);
+            uint8_t brightness = static_cast<uint8_t>(std::clamp(pow(((mapSize + 1) - distance) / mapSize, 2) * 255.0, 0.0, 255.0));
 
-            // ceiling
-            DrawVLine(screenCol, 0, settings.framebufferHeight / 2, 0x9C8255, 0xFF3E1016);
-            // floor
-            DrawVLine(screenCol, settings.framebufferHeight / 2,
-                      settings.framebufferHeight / 2, 0xFF000000, 0xFF110E1A);
-            // walls
+            // draw walls
             DrawVLine(screenCol, settings.framebufferHeight / 2 - wallHeight / 2, wallHeight, wallType, collisionAt, brightness);
         }
     }
@@ -376,10 +376,53 @@ namespace KrisRaycaster
         {
             int iy = y + i;
             uint32_t texColor = *(px + rowPixels * static_cast<int>(i * texStep));
-            framebuffer[iy * settings.framebufferWidth + x] = ApplyBrightnessAbgr(texColor, brightness);
+            texColor = ApplyBrightnessAbgr(texColor, brightness);
+            framebuffer[iy * settings.framebufferWidth + x] = texColor;
             // TODO: transpose framebuffer?
         }
     }
+
+    void Renderer::DrawHLines(int x, int y, int height, uint32_t fromColor, uint32_t toColor)
+    {
+        assert((y >= 0 && y < settings.framebufferHeight) || (height == 0));
+        assert(height >= 0 && height <= settings.framebufferHeight);
+        assert(x >= 0 && x < settings.framebufferWidth || (height == 0));
+
+        constexpr short stepSize = 4;
+
+        uint8_t fromA = (fromColor >> 24) & 0xFF;
+        uint8_t fromB = (fromColor >> 16) & 0xFF;
+        uint8_t fromG = (fromColor >> 8) & 0xFF;
+        uint8_t fromR = fromColor & 0xFF;
+
+        uint8_t toA = (toColor >> 24) & 0xFF;
+        uint8_t toB = (toColor >> 16) & 0xFF;
+        uint8_t toG = (toColor >> 8) & 0xFF;
+        uint8_t toR = toColor & 0xFF;
+
+        uint32_t currentColor = fromColor;
+
+        for (int i = 0; i < height; i++)
+        {
+            if (i % stepSize == 0)
+            {
+                const float t = static_cast<float>(i) / (height - 1);
+
+                // Linear interpolation
+                uint8_t a = static_cast<uint8_t>((1.0f - t) * fromA + t * toA);
+                uint8_t b = static_cast<uint8_t>((1.0f - t) * fromB + t * toB);
+                uint8_t g = static_cast<uint8_t>((1.0f - t) * fromG + t * toG);
+                uint8_t r = static_cast<uint8_t>((1.0f - t) * fromR + t * toR);
+
+                currentColor = (a << 24) | (b << 16) | (g << 8) | r;
+            }
+            int iy = y + i;
+            std::fill_n(framebuffer.begin() + iy * settings.framebufferWidth + x, 
+							settings.framebufferWidth, 
+							currentColor);
+        }
+    }
+
     void Renderer::BeforeFrame()
     {
         SDL_SetRenderTarget(sdlRend, nullptr);
@@ -392,6 +435,11 @@ namespace KrisRaycaster
     {
         // CastRaysStep();
         CastRaysDDA();
+    }
+
+    void Renderer::AfterFrame()
+    {
+        SDL_RenderPresent(sdlRend);
     }
 
     void Renderer::Render(double deltaTime)
@@ -407,8 +455,8 @@ namespace KrisRaycaster
                           static_cast<int>(settings.framebufferWidth * sizeof(uint32_t)));
         SDL_RenderCopy(sdlRend, framebufferTexture, nullptr, &rightRec);
         // display fps and resolution
-        int fps = floor(1.0f / deltaTime);
-        int time = floor(deltaTime * 1000);
+        const int fps = static_cast<int>(floor(1.0f / deltaTime));
+        const int time = static_cast<int>(floor(deltaTime * 1000));
         std::ostringstream stringStream;
         stringStream << fps << " fps (" << time << " ms)" << "\n"
                      << settings.framebufferWidth << "x"
@@ -420,7 +468,8 @@ namespace KrisRaycaster
         SDL_RenderCopy(sdlRend, messageTexture, nullptr, &messageRect);
         SDL_FreeSurface(message);
         SDL_DestroyTexture(messageTexture); // allocations every frame are slow
-        SDL_RenderPresent(sdlRend);
+
+        AfterFrame();
     }
 
     Renderer::~Renderer()

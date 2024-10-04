@@ -1,16 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(KrisRaycaster)
 
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(TARGET_PLATFORM "DESKTOP" CACHE STRING "DESKTOP")
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/desktop-sdl2")
 set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS DESKTOP)
-
-# Common source files
-#set(COMMON_SOURCES
-#        src/${PROJECT_NAME.c
-#        src/map.c
-#        src/player.c
-#)
 
 include(CheckCXXCompilerFlag)
 function(enable_cxx_compiler_flag_if_supported flag)
@@ -36,26 +28,21 @@ enable_cxx_compiler_flag_if_supported("-std=c++17")
 enable_cxx_compiler_flag_if_supported("-O3")
 add_compile_definitions(_USE_MATH_DEFINES)
 
-if (TARGET_PLATFORM STREQUAL "DESKTOP")
-    add_executable(${PROJECT_NAME} ${SOURCES})
-    add_executable(test_raycast src/debug/test_raycast/test_raycast.cpp)
-    set_target_properties(${PROJECT_NAME}
-    PROPERTIES 
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR})
-    find_package(SDL2 REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-            PRIVATE
-            $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-            $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-    )
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_DESKTOP USE_SDL)
-    find_package(SDL2_image CONFIG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
-    find_package(SDL2_ttf CONFIG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>)
-else ()
-    message(FATAL_ERROR "Unsupported TARGET_PLATFORM: ${TARGET_PLATFORM}")
-endif ()
+add_executable(${PROJECT_NAME} ${SOURCES})
+set_target_properties(${PROJECT_NAME}
+PROPERTIES 
+RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(SDL2 REQUIRED)
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+)
+target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_DESKTOP USE_SDL)
+find_package(SDL2_image CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
+find_package(SDL2_ttf CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)

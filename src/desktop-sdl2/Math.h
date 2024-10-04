@@ -343,14 +343,19 @@ inline Vec2 MapToScreen(Vec2f pos, Vec2 screenSize, int mapSize)
 }
 
 
-inline uint32_t ApplyBrightnessAbgr(uint32_t color, float brightness)
+inline uint32_t ApplyBrightnessAbgr(uint32_t color, int brightnessScale)
 {
     uint8_t a = (color >> 24) & 0xFF;
     uint8_t b = (color >> 16) & 0xFF;
     uint8_t g = (color >> 8) & 0xFF;
     uint8_t r = color & 0xFF; // Alpha remains unchanged
-    r = static_cast<uint8_t>(std::clamp(static_cast<int>(r * brightness), 0, 255));
-    g = static_cast<uint8_t>(std::clamp(static_cast<int>(g * brightness), 0, 255));
-    b = static_cast<uint8_t>(std::clamp(static_cast<int>(b * brightness), 0, 255));
+
+    r = (r * brightnessScale) >> 8;
+    g = (g * brightnessScale) >> 8;
+    b = (b * brightnessScale) >> 8;
+
+    r = r > 255 ? 255 : r;
+    g = g > 255 ? 255 : g;
+    b = b > 255 ? 255 : b;
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
