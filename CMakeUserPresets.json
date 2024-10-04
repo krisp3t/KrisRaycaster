@@ -3,9 +3,9 @@
     "configurePresets": [
         {
             "name": "vcpkg-submodule",
-            "inherits": "vcpkg",
+            "inherits": "vcpkg-system",
             "environment": {
-                "VCPKG_ROOT": "C:/vcpkg"
+                "VCPKG_ROOT": "${sourceDir}/extern/vcpkg"
             }
         }
     ]

@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.12)
 project(KrisRaycaster)
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/desktop-sdl2")
-set_property(CACHE TARGET_PLATFORM PROPERTY STRINGS DESKTOP)
 
 include(CheckCXXCompilerFlag)
 function(enable_cxx_compiler_flag_if_supported flag)
