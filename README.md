@@ -4,7 +4,9 @@ Feel free to read the [wiki](https://github.com/krisp3t/KrisRaycaster/wiki) to l
 # Overview
 A fun project I came up with to get started with embedded programming on STM32 platform!
 
-**KrisRaycaster** is a game built for STM32 microcontrollers. You can also run it in TouchGFX's simulator on Windows or through SDL2 on any supported x86 platform (Windows, MacOS, Linux).
+**KrisRaycaster** is a 3D raycasting renderer / game prototype built for STM32 microcontrollers. 
+- You can also run it in TouchGFX's simulator (Windows-only) or through SDL2 on any supported x86 platform (Windows, MacOS, Linux).
+- Desktop build uses **software rendering**, which is quite slow on bigger resolutions, keep this in mind when considering performance.
 
 Inspiration for the game are early 3D shooters, such as id Software's [Wolfenstein 3D](https://en.wikipedia.org/wiki/Wolfenstein_3D). These games were developed before the advent of dedicated graphics hardware, so all rendering was handled in software, drawing each pixel without the help of a modern graphics pipeline.
 
@@ -15,9 +17,16 @@ This project is educational in nature, and though it can be further optimized, m
 I hope to inspire you to tinker and explore further on your own!
 
 # Preview
+## Screenshots
+![Screenshot 2024-10-04 135702](https://github.com/user-attachments/assets/2ae592b8-b769-412e-a1a0-382a87ac935f)
+![Screenshot 2024-10-04 124905](https://github.com/user-attachments/assets/21360ac3-03ce-49e1-8821-5900214817e8)
+![Screenshot 2024-10-04 124842](https://github.com/user-attachments/assets/4ed30bfd-a6be-4f0b-82fe-5b41708f14aa)
+
+## YouTube
 [![3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://img.youtube.com/vi/vQCsKNYGYew/0.jpg)](https://www.youtube.com/watch?v=vQCsKNYGYew)
 
 [YouTube: 3D Raycaster Engine on STM32 | 1MB RAM, 60 FPS (STM32H750B-DK)](https://www.youtube.com/watch?v=vQCsKNYGYew)
+
 
 # Compatibility
 Tested on [STM32H750-DK](https://www.st.com/en/evaluation-tools/stm32h750b-dk.html) (480 MHz, 480x272 LCD-TFT, 1MB RAM, 128KB Flash). It also has DMA2D capabilities for HW acceleration.
